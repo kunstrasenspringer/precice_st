@@ -2,9 +2,15 @@ sudo: true
 dist: trusty
 jobs:
   include:
-  - stage: System Tests
+  - stage: Building preCICE
     script:
     - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    - docker build -f Dockerfile.precice -t precice .
+    - docker images
+    - docker tag precice $DOCKER_USERNAME/precice
+    - docker push $DOCKER_USERNAME/precice
+  - stage: System Tests
+    script:
     - docker build -f Dockerfile.su2-ccx -t su2-ccx .
     - docker run -it -d --name su2-ccx_container su2-ccx
     - docker cp su2-ccx_container:/home/alice/Output_su2-ccx .
