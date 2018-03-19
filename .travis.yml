@@ -1,0 +1,27 @@
+sudo: true
+dist: trusty
+jobs:
+  include:
+  - stage: System Tests
+    script:
+    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    - docker build -f Dockerfile.su2-ccx -t su2-ccx .
+    - docker run -it -d --name su2-ccx_container su2-ccx
+    - docker cp su2-ccx_container:/home/alice/Output_su2-ccx .
+    - python compare_su2-ccx.py
+    after_failure:
+    - sh push.sh Output_su2-ccx
+  - script:
+    - docker build -f Dockerfile.of-of -t of-of .
+    - docker run -it -d --name of-of_container of-of
+    - docker cp of-of_container:/home/alice/Output_of-of .
+    - python compare_of-of.py
+    after_failure:
+    - sh push.sh Output_of-of
+  - script:
+    - docker build -f Dockerfile.of-ccx -t of-ccx .
+    - docker run -it -d --name of-ccx_container of-ccx
+    - docker cp of-ccx_container:/home/alice/Output_of-ccx .
+    - python compare_of-ccx.py
+    after_failure:
+    - sh push.sh Output_of-ccx

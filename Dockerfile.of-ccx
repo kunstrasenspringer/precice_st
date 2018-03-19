@@ -1,0 +1,77 @@
+FROM kunstrasenspringer/precice:latest
+
+USER root
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    wget \
+    apt-transport-https \
+    libyaml-cpp-dev \
+    bzip2 \
+    libbz2-dev \
+    cmake \
+    automake \
+    autoconf \
+    autotools-dev \
+    libarpack2-dev
+
+# Install openfoam
+RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev"
+RUN sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
+RUN add-apt-repository http://dl.openfoam.org/ubuntu && apt update
+RUN apt-get -y install openfoam-dev --no-install-recommends
+
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+RUN . /opt/openfoam-dev/etc/bashrc
+
+USER alice
+WORKDIR /home/alice
+
+# Download Calculix 2.13
+RUN wget http://www.dhondt.de/ccx_2.13.src.tar.bz2 && \
+    tar -xf ccx_2.13.src.tar.bz2
+
+# Install yaml-cpp
+RUN git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp
+WORKDIR /home/alice/yaml-cpp
+RUN mkdir build && cd build && cmake /home/alice/yaml-cpp/ && make
+
+# Install spooles
+WORKDIR /home/alice/
+RUN mkdir spooles.2.2 && cd spooles.2.2 && \
+    wget http://www.netlib.org/linalg/spooles/spooles.2.2.tgz && \
+    tar -xf spooles.2.2.tgz && cd /home/alice/spooles.2.2/Tree/src/ && \
+    sed -i 's/drawTree/draw/g' makeGlobalLib && \
+    cd /home/alice/spooles.2.2/ && \
+    sed -i "s#CC = /usr/lang-4.0/bin/cc#CC = /usr/bin/cc#g" Make.inc && \
+    make lib && cd /home/alice/spooles.2.2/MT/src/ && make
+
+# Build calculix-adapter
+WORKDIR /home/alice/
+RUN git clone https://github.com/precice/calculix-adapter.git
+COPY Makefile /home/alice/calculix-adapter
+WORKDIR /home/alice/calculix-adapter/
+RUN make
+
+ENV PATH="/home/alice/calculix-adapter/bin:${PATH}"
+
+# Build openfoam-adapter
+WORKDIR /home/alice
+RUN git clone https://github.com/precice/openfoam-adapter.git
+WORKDIR /home/alice/openfoam-adapter
+RUN ./Allwmake
+
+# Download tutorial and meshes
+WORKDIR /home/alice
+RUN git clone https://github.com/precice/tutorials.git
+WORKDIR /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
+RUN ./Download_meshes
+
+# Simulate
+RUN . /opt/openfoam-dev/etc/bashrc && ./Allrun
+
+# Copy output to folder Output for further examination
+# WORKDIR /home/alice/
+# RUN mkdir Output_of-ccx && \
+#     cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Solid.log /home/alice/Output_of-ccx && \
+#     cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Fluid.log /home/alice/Output_of-ccx

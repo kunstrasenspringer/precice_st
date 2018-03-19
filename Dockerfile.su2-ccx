@@ -1,0 +1,77 @@
+FROM kunstrasenspringer/precice:latest
+
+USER root
+RUN apt-get update && apt-get install -y \
+    wget \
+    bzip2 \
+    libbz2-dev \
+    cmake \
+    automake \
+    autoconf \
+    autotools-dev \
+    libarpack2-dev
+
+USER alice
+WORKDIR /home/alice
+
+RUN wget http://www.dhondt.de/ccx_2.13.src.tar.bz2 && \
+    tar -xf ccx_2.13.src.tar.bz2
+
+RUN git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp
+WORKDIR /home/alice/yaml-cpp
+RUN mkdir build && cd build && cmake /home/alice/yaml-cpp/ && make
+
+WORKDIR /home/alice/
+RUN mkdir spooles.2.2 && cd spooles.2.2 && \
+    wget http://www.netlib.org/linalg/spooles/spooles.2.2.tgz && \
+    tar -xf spooles.2.2.tgz && cd /home/alice/spooles.2.2/Tree/src/ && \
+    sed -i 's/drawTree/draw/g' makeGlobalLib && \
+    cd /home/alice/spooles.2.2/ && \
+    sed -i "s#CC = /usr/lang-4.0/bin/cc#CC = /usr/bin/cc#g" Make.inc && \
+    make lib && cd /home/alice/spooles.2.2/MT/src/ && make
+
+WORKDIR /home/alice/
+RUN git clone https://github.com/precice/calculix-adapter.git
+COPY Makefile /home/alice/calculix-adapter
+WORKDIR /home/alice/calculix-adapter/
+RUN make
+
+ENV PATH="/home/alice/calculix-adapter/bin:${PATH}"
+
+WORKDIR /home/alice
+RUN git clone https://github.com/su2code/SU2.git su2-source
+RUN git clone https://github.com/precice/su2-adapter.git
+
+ENV SU2_HOME="/home/alice/su2-source"
+ENV SU2_BIN="/home/alice/su2-bin"
+ENV SU2_RUN="/home/alice/su2-bin/bin"
+ENV PATH="/home/alice/su2-bin/bin:${PATH}"
+ENV PYTHONPATH="/home/alice/su2-bin/bin:${PYTHONPATH}"
+
+WORKDIR /home/alice/su2-adapter
+RUN ./su2AdapterInstall
+
+WORKDIR /home/alice/su2-source
+RUN ./configure --prefix=${SU2_BIN} CXXFLAGS="-std=c++11" --enable-mpi
+RUN make -j 2 install
+
+WORKDIR /home/alice/
+RUN git clone https://github.com/precice/tutorials.git
+
+WORKDIR /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
+RUN ccx_preCICE -i flap -precice-participant Calculix & SU2_CFD euler_config_coupled.cfg &>/dev/null; exit 0
+
+WORKDIR /home/alice/
+RUN mkdir Output_su2-ccx && cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flow*.vtk /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flap.cvg /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flap.dat /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flap.frd /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flap.sta /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/convergence-Calculix.txt /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/forces_breakdown.dat /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/iterations-Calculix.txt /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/iterations-SU2_CFD.txt /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/point1.watchpoint.txt /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/restart_flow_*.dat /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/spooles.out /home/alice/Output_su2-ccx && \
+cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/surface_flow_*.csv /home/alice/Output_su2-ccx

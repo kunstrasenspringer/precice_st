@@ -1,0 +1,31 @@
+FROM kunstrasenspringer/precice:latest
+
+USER root
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    wget apt-transport-https \
+    libyaml-cpp-dev
+
+RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev"
+RUN sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
+RUN add-apt-repository http://dl.openfoam.org/ubuntu && apt update
+RUN apt-get -y install openfoam-dev --no-install-recommends
+
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+RUN . /opt/openfoam-dev/etc/bashrc
+
+USER alice
+WORKDIR /home/alice
+
+RUN git clone https://github.com/precice/openfoam-adapter.git
+WORKDIR /home/alice/openfoam-adapter
+RUN ./Allwmake
+
+WORKDIR /home/alice/openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam
+RUN . /opt/openfoam-dev/etc/bashrc && ./Allrun
+
+WORKDIR /home/alice/
+RUN mkdir Output_of-of && \
+    cp /home/alice/openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Solid.log /home/alice/Output_of-of && \
+    cp /home/alice/openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Fluid.log /home/alice/Output_of-of
