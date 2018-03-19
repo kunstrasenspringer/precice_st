@@ -15,7 +15,7 @@ Design und Implementation of system tests for the distributed multi-physics simu
 Continuous Integration config.
 2 [build stages](https://docs.travis-ci.com/user/build-stages/):
 - stage 1 (build stage): precice docker image build and pushed to [Docker Hub](https://hub.docker.com/r/kunstrasenspringer/precice/)
-- stage 2 (testing stage): build su2-ccx, of-of, of-ccx
+- stage 2 (testing stage): build su2-ccx, of-of, of-ccx and push outputfiles to repo
 
 # compare_*.py
 Python script to compare reference data with output data.
