@@ -59,7 +59,7 @@ WORKDIR /home/alice/
 RUN git clone https://github.com/precice/tutorials.git
 
 WORKDIR /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
-RUN ccx_preCICE -i flap -precice-participant Calculix & SU2_CFD euler_config_coupled.cfg ; exit 0
+RUN ccx_preCICE -i flap -precice-participant Calculix & SU2_CFD euler_config_coupled.cfg &>/dev/null; exit 0
 #&>/dev/null
 WORKDIR /home/alice/
 RUN mkdir Output_su2-ccx && cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flow*.vtk /home/alice/Output_su2-ccx && \
