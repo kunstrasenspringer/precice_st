@@ -2,14 +2,6 @@ sudo: true
 dist: trusty
 jobs:
   include:
-  - stage: Building preCICE
-    script:
-    - docker build -f Dockerfile.precice -t precice .
-    after_success:
-    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-    - docker images
-    - docker tag precice $DOCKER_USERNAME/precice
-    - docker push $DOCKER_USERNAME/precice
   - stage: System Tests
     script:
     - docker build -f Dockerfile.su2-ccx -t su2-ccx .
@@ -17,21 +9,9 @@ jobs:
     - docker cp su2-ccx_container:/home/alice/Output_su2-ccx .
     - python compare_su2-ccx.py
     after_failure:
+    - docker cp su2-ccx_container:/home/alice/log_su2-ccx .
+    - sh log_su2-ccx_travis.sh
     - sh push.sh Output_su2-ccx
-  - script:
-    - docker build -f Dockerfile.of-of -t of-of .
-    - docker run -it -d --name of-of_container of-of
-    - docker cp of-of_container:/home/alice/Output_of-of .
-    - python compare_of-of.py
-    after_failure:
-    - sh push.sh Output_of-of
-  - script:
-    - docker build -f Dockerfile.of-ccx -t of-ccx .
-    - docker run -it -d --name of-ccx_container of-ccx
-    - docker cp of-ccx_container:/home/alice/Output_of-ccx .
-    - python compare_of-ccx.py
-    after_failure:
-    - sh push.sh Output_of-ccx
 env:
   global:
     secure: rM4naaBFg4a3v6NacTd7BbZ9LYuLFs4Pgqe9lYM6fZtg7hNCosf1WP26mn/P7MgCoCB6S3LvMFPiCXAcs5wYT2FJk4aKGfUC1X3umO938CJOWGTSbhkmI5BvutksOOtyDR57URlj8pBsYVOMU1QE8to33crFXo3QEm/1DLtsgHOpRBjqhDaNh44RdzbjpN5fmZFJWOXPx+v+IXOngrdrxHAy8N0nR95oBPuFz8tgLswvmYUvQRlX2l3Ku1XNxLzp7YeviLVb7t3czf3p1B6pttSqtgrkRQ5kXPPNz5XmKWnGgkRsGzTWHqiKAkraRzOz0OS66/EjGk7MAKVAkRoLtOeYDDfmMn+Z3qQ9XwCC8WhnyQSdz6s+/oWqw+tF0ErT65azbZ0iOzgsXOmGTp4ai5TNWbXd1/vMErHHy7GPghUm2gKusAbtaUgi0Zj+GyRUGiU0Vxemm1mLFGKPpuP+B+1M5zWIDWN11DROewK1Fm8xsJ2gF8+//8o/Xau2niO+ZfTje2mP7SOjZiJJM6Qo7HN/KMecK27BRPbDm+LekTc5U6IViyoI2fHt/6sUpLsGphaKClMW3513leacGjYJZW1d8K9vjbBcfvF4TevCztgkW7Vz3hrQlkBDL0Ghr8vefl5JYKDf/JJ7O08noSyMSGC0ueupz6iw+mojuhOPz2c=
