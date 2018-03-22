@@ -4,8 +4,9 @@ jobs:
   include:
   - stage: Building preCICE
     script:
-    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
     - docker build -f Dockerfile.precice -t precice .
+    after_success:
+    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
     - docker images
     - docker tag precice $DOCKER_USERNAME/precice
     - docker push $DOCKER_USERNAME/precice
