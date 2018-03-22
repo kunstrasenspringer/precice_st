@@ -10,7 +10,7 @@ commit_files() {
   git fetch
   git checkout master
   git add $output
-  git commit --message "travis_build_number: $TRAVIS_BUILD_NUMBER, $PRECICE_VERSION, $SU2_VERSION, $SU2_ADAPTER_VERSION, $CALCULIX_VERSION, $CCX_ADAPTER_VERSION"
+  git commit --message "travis_build_number: $TRAVIS_BUILD_NUMBER, $PRECICE_VERSION, $SU2_VERSION, $SU2_ADAPTER_VERSION, $CALCULIX_VERSION, $CCX_ADAPTER_VERSION, $TUTORIALS_VERSION"
 }
 
 upload_files() {

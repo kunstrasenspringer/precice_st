@@ -5,4 +5,5 @@ if [ -e "log_su2-ccx" ]; then
   SU2_ADAPTER_VERSION=$(sed '3!d' log_su2-ccx)
   CALCULIX_VERSION=$(sed '4!d' log_su2-ccx)
   CCX_ADAPTER_VERSION=$(sed '5!d' log_su2-ccx)
+  TUTORIALS_VERSION=$(sed '6!d' log_su2-ccx)
 fi

@@ -23,6 +23,11 @@ CCX_ADAPTER_VERSION=$(git rev-parse HEAD)
 CCX_ADAPTER_VERSION="calculix-adapter_commit_version: "$CCX_ADAPTER_VERSION
 echo $CCX_ADAPTER_VERSION >> /home/alice/log_su2-ccx
 
+cd /home/alice/tutorials/
+TUTORIALS_VERSION=$(git rev-parse HEAD)
+TUTORIALS_VERSION="calculix-adapter_commit_version: "$TUTORIALS_VERSION
+echo $TUTORIALS_VERSION >> /home/alice/log_su2-ccx
+
 
 
 
