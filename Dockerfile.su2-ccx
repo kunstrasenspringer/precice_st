@@ -53,16 +53,17 @@ RUN ./su2AdapterInstall
 
 WORKDIR /home/alice/su2-source
 RUN ./configure --prefix=${SU2_BIN} CXXFLAGS="-std=c++11" --enable-mpi
-COPY reducing_log /home/alice/su2-source
-USER root
-RUN ./reducing_log
+RUN make -j 2 install
+
 
 USER alice
 WORKDIR /home/alice/
 RUN git clone https://github.com/precice/tutorials.git
 
 WORKDIR /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
-RUN ccx_preCICE -i flap -precice-participant Calculix & SU2_CFD euler_config_coupled.cfg; exit 0
+COPY reducing_log /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
+USER root
+RUN ./reducing_log; exit 0
 
 WORKDIR /home/alice/
 RUN mkdir Output_su2-ccx && cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flow*.vtk /home/alice/Output_su2-ccx && \
