@@ -54,7 +54,7 @@ RUN ./su2AdapterInstall
 WORKDIR /home/alice/su2-source
 RUN ./configure --prefix=${SU2_BIN} CXXFLAGS="-std=c++11" --enable-mpi
 COPY reducing_log /home/alice/su2-source
-RUN ./reducing_log
+RUN sh reducing_log.sh
 
 WORKDIR /home/alice/
 RUN git clone https://github.com/precice/tutorials.git
