@@ -26,3 +26,4 @@ Reference files.
 # Others
 - Makefile: needed to build calculix-adapter in Dockerfile.su2-ccx and Dockerfile.of-ccx
 - push.sh: script to push outputfiles back to rep [HowTo](https://gist.github.com/willprice/e07efd73fb7f13f917ea#file-push-sh)
+- How to push to [hub.docker.com](https://hub.docker.com/) [link1](https://docs.travis-ci.com/user/docker/#Pushing-a-Docker-Image-to-a-Registry) [link2](https://docs.travis-ci.com/user/build-stages/share-docker-image/)
