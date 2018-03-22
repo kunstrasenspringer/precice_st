@@ -10,7 +10,7 @@ commit_files() {
   git fetch
   git checkout master
   git add $output
-  git commit --message "$ref updated: $TRAVIS_BUILD_NUMBER"
+  git commit --message "$output updated: $TRAVIS_BUILD_NUMBER"
 }
 
 upload_files() {
