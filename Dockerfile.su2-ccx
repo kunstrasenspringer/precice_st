@@ -61,7 +61,7 @@ WORKDIR /home/alice/
 RUN git clone https://github.com/precice/tutorials.git
 
 WORKDIR /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
-COPY reducing_log /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
+COPY reducing_log_su2-ccx /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
 USER root
 RUN ./reducing_log_su2-ccx; exit 0
 
