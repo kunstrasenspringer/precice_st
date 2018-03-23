@@ -28,8 +28,8 @@ USER alice
 WORKDIR /home/alice
 
 # Download Calculix 2.13
-RUN wget http://www.dhondt.de/ccx_2.13.src.tar.bz2 && \
-    tar -xf ccx_2.13.src.tar.bz2
+RUN wget http://www.dhondt.de/ccx_2.12.src.tar.bz2 && \
+    tar -xf ccx_2.12.src.tar.bz2
 
 # Install yaml-cpp
 RUN git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp
@@ -49,8 +49,9 @@ RUN mkdir spooles.2.2 && cd spooles.2.2 && \
 # Build calculix-adapter
 WORKDIR /home/alice/
 RUN git clone https://github.com/precice/calculix-adapter.git
-COPY Makefile /home/alice/calculix-adapter
 WORKDIR /home/alice/calculix-adapter/
+RUN git fetch && git checkout v2.12
+COPY Makefile_of_ccx /home/alice/calculix-adapter/Makefile
 RUN make
 
 ENV PATH="/home/alice/calculix-adapter/bin:${PATH}"
@@ -65,13 +66,22 @@ RUN ./Allwmake
 WORKDIR /home/alice
 RUN git clone https://github.com/precice/tutorials.git
 WORKDIR /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
-RUN ./Download_meshes
+RUN ./Download_meshes && \
+    cd Inner-Fluid/system/ && \
+    sed -i 's/endTime.*/endTime 20.0/' controlDict && \
+    cd /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid/system && \
+    sed -i 's/endTime.*/endTime 20.0/' controlDict
 
 # Simulate
-RUN . /opt/openfoam-dev/etc/bashrc && ./Allrun
+WORKDIR /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
+COPY reducing_log /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
+USER root
+RUN ./reducing_log_of-ccx
+#RUN . /opt/openfoam-dev/etc/bashrc && ./Allrun
 
-# Copy output to folder Output for further examination
-# WORKDIR /home/alice/
-# RUN mkdir Output_of-ccx && \
-#     cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Solid.log /home/alice/Output_of-ccx && \
-#     cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Fluid.log /home/alice/Output_of-ccx
+Copy output to folder Output for further examination
+WORKDIR /home/alice/
+RUN mkdir Output_of-ccx && \
+    cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Solid.log /home/alice/Output_of-ccx && \
+    cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Inner-Fluid.log /home/alice/Output_of-ccx && \
+    cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid.log /home/alice/Output_of-ccx
