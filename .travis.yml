@@ -26,7 +26,9 @@ jobs:
     - docker cp of-of_container:/home/alice/Output_of-of .
     - python compare_of-of.py
     after_failure:
-    - sh push.sh Output_of-of
+    - docker cp of-of_container:/home/alice/log_of-of .
+    - sh log_of-of_travis.sh
+    - sh push_of-of.sh Output_of-of
   - script:
     - docker build -f Dockerfile.of-ccx -t of-ccx .
     - docker run -it -d --name of-ccx_container of-ccx
