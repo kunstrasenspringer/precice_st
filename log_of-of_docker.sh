@@ -2,7 +2,7 @@
 # Saving used sofware version in a log file
 
 # log file
-touch log_su2-ccx
+touch log_of-of
 
 # version of preCICE
 cd /home/alice/precice/
