@@ -1,4 +1,6 @@
 #!/bin/sh
+# saving version numbers of used software in variables. Variables will be used
+# later in git comment. Version numbers are in file: log_su2-ccx
 if [ -e "log_su2-ccx" ]; then
   PRECICE_VERSION=$(sed '1!d' log_su2-ccx)
   SU2_VERSION=$(sed '2!d' log_su2-ccx)
