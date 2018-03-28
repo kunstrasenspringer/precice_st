@@ -77,7 +77,6 @@ WORKDIR /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
 COPY reducing_log /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
 USER root
 RUN ./reducing_log_of-ccx
-RUN ./reducing_log_of-ccx
 
 Copy output to folder Output for further examination
 WORKDIR /home/alice/
