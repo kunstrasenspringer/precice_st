@@ -37,17 +37,3 @@ cd /home/alice/tutorials/
 TUTORIALS_VERSION=$(git rev-parse HEAD)
 TUTORIALS_VERSION="calculix-adapter_commit_version: "$TUTORIALS_VERSION
 echo $TUTORIALS_VERSION >> /home/alice/log_su2-ccx
-
-
-
-
-
-
-
-
-
-
-
-#source log.sh
-#PRECICE_VERSION=$(command grep -m1 '##[^"]*' /home/kunst/tmp/test/doc)
-#PRECICE_VERSION="precice_version: "$PRECICE_VERSION
