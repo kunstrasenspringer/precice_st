@@ -62,7 +62,7 @@ RUN git clone https://github.com/precice/openfoam-adapter.git
 WORKDIR /home/alice/openfoam-adapter
 RUN ./Allwmake
 
-# Download tutorial and meshes
+# Download tutorial and meshes and set endTime to 20.0
 WORKDIR /home/alice
 RUN git clone https://github.com/precice/tutorials.git
 WORKDIR /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
