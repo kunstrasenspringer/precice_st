@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     libyaml-cpp-dev
 
 RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev"
-RUN sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
+RUN sh -c "wget -O -nv - http://dl.openfoam.org/gpg.key | apt-key add -"
 RUN add-apt-repository http://dl.openfoam.org/ubuntu && apt update
 RUN apt-get -y install openfoam-dev --no-install-recommends
 
