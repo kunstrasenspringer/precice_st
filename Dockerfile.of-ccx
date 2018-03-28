@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install openfoam
 RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev"
-RUN sh -c "wget -O -nv - http://dl.openfoam.org/gpg.key | apt-key add -"
+RUN sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
 RUN add-apt-repository http://dl.openfoam.org/ubuntu && apt update
 RUN apt-get -y install openfoam-dev --no-install-recommends
 
@@ -78,7 +78,7 @@ COPY reducing_log /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
 USER root
 RUN ./reducing_log_of-ccx
 
-Copy output to folder Output for further examination
+# Copy output to folder Output for further examination
 WORKDIR /home/alice/
 RUN mkdir Output_of-ccx && \
     cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Solid.log /home/alice/Output_of-ccx && \
