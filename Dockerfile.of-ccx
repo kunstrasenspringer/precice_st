@@ -27,7 +27,7 @@ RUN . /opt/openfoam-dev/etc/bashrc
 USER alice
 WORKDIR /home/alice
 
-# Download Calculix 2.13
+# Download Calculix 2.12
 RUN wget -nv http://www.dhondt.de/ccx_2.12.src.tar.bz2 && \
     tar -xf ccx_2.12.src.tar.bz2
 
