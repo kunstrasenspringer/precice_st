@@ -8,7 +8,7 @@ touch log_su2-ccx
 cd /home/alice/precice/
 PRECICE_VERSION=$(git describe --tags)
 PRECICE_VERSION="precice_version: "$PRECICE_VERSION
-echo $PRECICE_VERSION >> log_su2-ccx
+echo $PRECICE_VERSION >> /home/alice/log_su2-ccx
 
 # version of SU2
 cd /home/alice/su2-source
@@ -32,7 +32,7 @@ CCX_ADAPTER_VERSION=$(git rev-parse HEAD)
 CCX_ADAPTER_VERSION="calculix-adapter_commit_version: "$CCX_ADAPTER_VERSION
 echo $CCX_ADAPTER_VERSION >> /home/alice/log_su2-ccx
 
-# version of tutorials 
+# version of tutorials
 cd /home/alice/tutorials/
 TUTORIALS_VERSION=$(git rev-parse HEAD)
 TUTORIALS_VERSION="calculix-adapter_commit_version: "$TUTORIALS_VERSION
