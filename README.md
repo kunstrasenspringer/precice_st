@@ -29,4 +29,4 @@ Reference files.
 - How to push to [hub.docker.com](https://hub.docker.com/) [link1](https://docs.travis-ci.com/user/docker/#Pushing-a-Docker-Image-to-a-Registry) [link2](https://docs.travis-ci.com/user/build-stages/share-docker-image/)
 
 # Status
-[![Build Status](https://travis-ci.org/kunstrasenspringer/precice_st.svg?branch=master)](https://travis-ci.org/kunstrasenspringer/precice_st)
+[![Build Status](https://travis-ci.org/kunstrasenspringer/precice_st.svg?branch=develop)](https://travis-ci.org/kunstrasenspringer/precice_st)

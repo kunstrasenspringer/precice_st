@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 USER alice
 WORKDIR /home/alice
 
-RUN wget http://www.dhondt.de/ccx_2.13.src.tar.bz2 && \
+RUN wget -nv http://www.dhondt.de/ccx_2.13.src.tar.bz2 && \
     tar -xf ccx_2.13.src.tar.bz2
 
 RUN git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp
@@ -32,7 +32,7 @@ RUN mkdir spooles.2.2 && cd spooles.2.2 && \
 
 WORKDIR /home/alice/
 RUN git clone https://github.com/precice/calculix-adapter.git
-COPY Makefile /home/alice/calculix-adapter
+COPY Makefile_su2-ccx /home/alice/calculix-adapter/Makefile
 WORKDIR /home/alice/calculix-adapter/
 RUN make
 
@@ -55,11 +55,15 @@ WORKDIR /home/alice/su2-source
 RUN ./configure --prefix=${SU2_BIN} CXXFLAGS="-std=c++11" --enable-mpi
 RUN make -j 2 install
 
+
+USER alice
 WORKDIR /home/alice/
 RUN git clone https://github.com/precice/tutorials.git
 
 WORKDIR /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
-RUN ccx_preCICE -i flap -precice-participant Calculix & SU2_CFD euler_config_coupled.cfg &>/dev/null; exit 0
+COPY reducing_log_su2-ccx /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
+USER root
+RUN ./reducing_log_su2-ccx; exit 0
 
 WORKDIR /home/alice/
 RUN mkdir Output_su2-ccx && cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flow*.vtk /home/alice/Output_su2-ccx && \
@@ -75,3 +79,6 @@ cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/point1.watchpoint.txt /home/
 cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/restart_flow_*.dat /home/alice/Output_su2-ccx && \
 cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/spooles.out /home/alice/Output_su2-ccx && \
 cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/surface_flow_*.csv /home/alice/Output_su2-ccx
+
+COPY log_su2-ccx_docker.sh /home/alice/
+RUN sh log_su2-ccx_docker.sh

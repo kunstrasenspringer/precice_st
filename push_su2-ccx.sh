@@ -1,4 +1,5 @@
 #!/bin/sh
+# pushes generated output files back to github, if output files != ref files
 output=$1
 
 setup_git() {
@@ -10,7 +11,12 @@ commit_files() {
   git fetch
   git checkout master
   git add $output
-  git commit --message "$output updated: $TRAVIS_BUILD_NUMBER"
+  git commit -m "Output!=Ref $TRAVIS_BUILD_NUMBER" -m "$PRECICE_VERSION,
+  $SU2_VERSION,
+  $SU2_ADAPTER_VERSION,
+  $CALCULIX_VERSION,
+  $CCX_ADAPTER_VERSION,
+  $TUTORIALS_VERSION"
 }
 
 upload_files() {
