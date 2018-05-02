@@ -1,7 +1,9 @@
 # System testing openfoam-adapter and calculix-adapter for preCICE
 
 # Building on top of the latets preCICE-build
-FROM precice:latest
+FROM kunstrasenspringer/precice:latest
+
+USER root
 
 # Installing necessary dependecies
 RUN apt-get update && apt-get install -y \
