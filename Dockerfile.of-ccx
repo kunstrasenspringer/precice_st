@@ -20,10 +20,10 @@ RUN apt-get update && apt-get install -y \
     libyaml-cpp-dev
 
 # Installing OpenFOAM 4.1
-RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev"
-RUN sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
-RUN add-apt-repository http://dl.openfoam.org/ubuntu && apt update
-RUN apt-get -y install openfoam4 --no-install-recommends
+RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev" && \
+    sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -" && \
+    add-apt-repository http://dl.openfoam.org/ubuntu && apt update && \
+    apt-get -y install openfoam4 --no-install-recommends
 
 ENV USER=root
 # RUN echo "source /opt/openfoam4/etc/bashrc" >> /root/.bashrc
