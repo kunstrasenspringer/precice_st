@@ -1,86 +1,104 @@
-FROM kunstrasenspringer/precice:latest
+# System testing openfoam-adapter and calculix-adapter for preCICE
 
-USER root
+# Building on top of the latets preCICE-build
+FROM precice:latest
+
+# Installing necessary dependecies
 RUN apt-get update && apt-get install -y \
     software-properties-common \
     wget \
     apt-transport-https \
-    libyaml-cpp-dev \
     bzip2 \
     libbz2-dev \
     cmake \
     automake \
     autoconf \
     autotools-dev \
-    libarpack2-dev
+    libarpack2-dev \
+    libyaml-cpp-dev
 
-# Install openfoam
+# Installing OpenFOAM 4.1
 RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev"
 RUN sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
 RUN add-apt-repository http://dl.openfoam.org/ubuntu && apt update
-RUN apt-get -y install openfoam-dev --no-install-recommends
+RUN apt-get -y install openfoam4 --no-install-recommends
 
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+ENV USER=root
+# RUN echo "source /opt/openfoam4/etc/bashrc" >> /root/.bashrc
 
-RUN . /opt/openfoam-dev/etc/bashrc
+# Building openfoam-adapter
+WORKDIR /
+RUN git clone https://github.com/precice/openfoam-adapter.git
+WORKDIR /openfoam-adapter
+RUN . /opt/openfoam4/etc/bashrc && ./Allwmake
 
-USER alice
-WORKDIR /home/alice
-
-# Download Calculix 2.12
+# Downloading Calculix 2.12
+WORKDIR /
 RUN wget -nv http://www.dhondt.de/ccx_2.12.src.tar.bz2 && \
     tar -xf ccx_2.12.src.tar.bz2
 
-# Install yaml-cpp
+# Installing yaml-cpp
 RUN git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp
-WORKDIR /home/alice/yaml-cpp
-RUN mkdir build && cd build && cmake /home/alice/yaml-cpp/ && make
+WORKDIR /yaml-cpp
+RUN mkdir build && cd build && cmake /yaml-cpp/ && make
 
-# Install spooles
-WORKDIR /home/alice/
+# Installing spooles
+WORKDIR /
 RUN mkdir spooles.2.2 && cd spooles.2.2 && \
     wget -nv http://www.netlib.org/linalg/spooles/spooles.2.2.tgz && \
-    tar -xf spooles.2.2.tgz && cd /home/alice/spooles.2.2/Tree/src/ && \
+    tar -xf spooles.2.2.tgz && cd /spooles.2.2/Tree/src/ && \
     sed -i 's/drawTree/draw/g' makeGlobalLib && \
-    cd /home/alice/spooles.2.2/ && \
+    cd /spooles.2.2/ && \
     sed -i "s#CC = /usr/lang-4.0/bin/cc#CC = /usr/bin/cc#g" Make.inc && \
-    make lib && cd /home/alice/spooles.2.2/MT/src/ && make
+    make lib && cd /spooles.2.2/MT/src/ && make
 
-# Build calculix-adapter
-WORKDIR /home/alice/
+# Downloading and installing ARPACK
+USER root
+RUN wget -nv http://www.caam.rice.edu/software/ARPACK/SRC/arpack96.tar.gz \
+    && tar xvzf arpack96.tar.gz \
+    && mv ARPACK /usr/local/ARPACK \
+    && cd /usr/local/ARPACK \
+    && sed -i 's/$(HOME)/\/usr\/local/g' ARmake.inc \
+    && sed -i 's/\/bin\/make/make/g' ARmake.inc \
+    && sed -i 's/f77/gfortran/g' ARmake.inc \
+    && sed -i 's/SUN4/INTEL/g' ARmake.inc \
+    && sed -i 's/-cg89//g' ARmake.inc \
+    && sed -i 's/      EXTERNAL           ETIME/*     EXTERNAL           ETIME/g' UTIL/second.f \
+    && make all
+
+# Building calculix-adapter
+WORKDIR /
 RUN git clone https://github.com/precice/calculix-adapter.git
-WORKDIR /home/alice/calculix-adapter/
+WORKDIR /calculix-adapter/
 RUN git fetch && git checkout v2.12
-COPY Makefile_of_ccx /home/alice/calculix-adapter/Makefile
+COPY Makefile_of_ccx /calculix-adapter/Makefile
 RUN make
 
-ENV PATH="/home/alice/calculix-adapter/bin:${PATH}"
+ENV PATH="/calculix-adapter/bin:${PATH}"
 
-# Build openfoam-adapter
-WORKDIR /home/alice
-RUN git clone https://github.com/precice/openfoam-adapter.git
-WORKDIR /home/alice/openfoam-adapter
-RUN ./Allwmake
-
-# Download tutorial and meshes and set endTime to 20.0
-WORKDIR /home/alice
+# Downloading tutorial and meshes and set endTime to 20.0
+WORKDIR /
 RUN git clone https://github.com/precice/tutorials.git
-WORKDIR /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
-RUN ./Download_meshes && \
-    cd Inner-Fluid/system/ && \
-    sed -i 's/endTime.*/endTime 20.0/' controlDict && \
-    cd /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid/system && \
-    sed -i 's/endTime.*/endTime 20.0/' controlDict
+WORKDIR /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
+RUN ./Download_meshes
+COPY precice-config_serial.xml /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/precice-config_serial.xml
+COPY precice-config.xml /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/precice-config_serial.xml
+COPY controlDict /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Inner-Fluid/system/controlDict
+COPY controlDict /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid/system/controlDict
 
-# Simulate
-WORKDIR /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
-COPY reducing_log /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
-USER root
-RUN ./reducing_log_of-ccx
+# Simulating
+WORKDIR /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
+RUN . /opt/openfoam4/etc/bashrc && ./Allrun
 
-# Copy output to folder Output for further examination
-WORKDIR /home/alice/
-RUN mkdir Output_of-ccx && \
-    cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Solid.log /home/alice/Output_of-ccx && \
-    cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Inner-Fluid.log /home/alice/Output_of-ccx && \
-    cp /home/alice/tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid.log /home/alice/Output_of-ccx
+
+### below Code for travis, but first the above code should work.
+
+# COPY reducing_log_of-ccx /tutorials/FSI/flap_perp/SU2-CalculiX
+# RUN ./reducing_log_of-ccx
+#
+# # Copy output to folder Output for further examination
+# WORKDIR /
+# RUN mkdir Output_of-ccx && \
+#     cp /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Solid.log /Output_of-ccx && \
+#     cp /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Inner-Fluid.log /Output_of-ccx && \
+#     cp /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid.log /Output_of-ccx
