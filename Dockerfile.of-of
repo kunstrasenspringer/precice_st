@@ -1,31 +1,34 @@
-FROM kunstrasenspringer/precice:latest
+# System testing openfoam-adapter for preCICE
 
-USER root
+# Using latest preCICE from dockerhub.com
+FROM precice:latest
+
+# Install dependecies
 RUN apt-get update && apt-get install -y \
     software-properties-common \
     wget apt-transport-https \
     libyaml-cpp-dev
 
+# Installing OpenFOAM 4.1
 RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev"
 RUN sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
 RUN add-apt-repository http://dl.openfoam.org/ubuntu && apt update
-RUN apt-get -y install openfoam-dev --no-install-recommends
+RUN apt-get -y install openfoam4 --no-install-recommends
 
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+ENV USER=root
 
-RUN . /opt/openfoam-dev/etc/bashrc
-
-USER alice
-WORKDIR /home/alice
-
+# Building openfoam-adapter
+WORkDIR /
 RUN git clone https://github.com/precice/openfoam-adapter.git
-WORKDIR /home/alice/openfoam-adapter
-RUN ./Allwmake
+WORKDIR /openfoam-adapter
+RUN . /opt/openfoam4/etc/bashrc && ./Allwmake
 
-WORKDIR /home/alice/openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam
-RUN . /opt/openfoam-dev/etc/bashrc && ./Allrun
+# Simulating
+WORKDIR /openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam
+RUN . /opt/openfoam4/etc/bashrc; ./Allrun
 
-WORKDIR /home/alice/
+# Copying output files to a folder for further examination
+WORKDIR /
 RUN mkdir Output_of-of && \
-    cp /home/alice/openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Solid.log /home/alice/Output_of-of && \
-    cp /home/alice/openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Fluid.log /home/alice/Output_of-of
+    cp /openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Solid.log /Output_of-of && \
+    cp /openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Fluid.log /Output_of-of

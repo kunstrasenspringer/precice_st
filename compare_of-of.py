@@ -6,12 +6,8 @@ pathToTest1 = os.getcwd() + '/ref_of-of/'
 pathToTest2 = os.getcwd() + '/Output_of-of/'
 
 os.chdir(pathToTest2)
-subprocess.call(['sed', '-i', '-e', '1,110d', 'Fluid.log'])
-subprocess.call(['sed', '-i', '-e', '1,75d', 'Solid.log'])
-command = ["sed", "-i", "/ExecutionTime/d", "Solid.log"]
-subprocess.call(command)
-command = ["sed", "-i", "/ExecutionTime/d", "Fluid.log"]
-subprocess.call(command)
+subprocess.call(['sed', '-i', '-e', '1,20d', 'Fluid.log'])
+subprocess.call(['sed', '-i', '-e', '1,20d', 'Solid.log'])
 
 fileListTest1 = os.listdir(pathToTest1)
 fileListTest2 = os.listdir(pathToTest2)

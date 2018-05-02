@@ -1,9 +1,9 @@
 # Specify the locations of: the original CCX source, SPOOLES and ARPACK
-CCX			= /home/alice/CalculiX/ccx_2.12/src
-SPOOLES			= /home/alice/spooles.2.2
-ARPACK			= /usr/lib
-PRECICE_ROOT		= /home/alice/precice
-YAML            	= /home/alice/yaml-cpp
+CCX			= /CalculiX/ccx_2.12/src
+SPOOLES			= /spooles.2.2
+ARPACK			= /usr/local/ARPACK
+PRECICE_ROOT		= /precice
+YAML            	= /yaml-cpp
 
 # Specify where to store the generated .o files
 OBJDIR 		= bin
@@ -20,7 +20,7 @@ INCLUDES = \
 
 LIBS = \
 	$(SPOOLES)/spooles.a \
-	$(ARPACK)/libarpack.a \
+	$(ARPACK)/libarpack_INTEL.a \
     	-lm -lc -lpthread -llapack -lblas \
     	-L$(PRECICE_ROOT)/build/last \
     	-lprecice \
@@ -32,7 +32,7 @@ LIBS = \
 	-lboost_program_options \
     	-lpython2.7 \
     	-lstdc++ \
-	-lpetsc \
+	-L$(PETSC_DIR)/$(PETSC_ARCH)/lib -lpetsc \
     	-lmpi_cxx \
     	-L$(YAML)/build \
     	-lyaml-cpp \

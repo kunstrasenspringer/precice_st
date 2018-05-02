@@ -1,0 +1,30 @@
+FoamFile {
+    version 2.0;
+    class dictionary;
+    object controlDict;
+    format ascii;
+}
+application chtMultiRegionSimpleFoam;
+startFrom startTime;
+stopAt endTime;
+writeFormat ascii;
+writePrecision 1;
+writeCompression on;
+timeFormat general;
+timePrecision 1;
+runTimeModifiable no;
+deltaT 1;
+startTime 0.0;
+writeInterval 1;
+adjustTimeStep no;
+endTime 5.0;
+writeControl timeStep;
+
+functions
+{
+    preCICE_Adapter
+    {
+        type preciceAdapterFunctionObject;
+        libs ("libpreciceAdapterFunctionObject.so");
+    }
+}

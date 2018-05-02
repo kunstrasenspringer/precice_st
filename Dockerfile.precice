@@ -1,4 +1,9 @@
-FROM ubuntu:18.04
+# Dockerfile for building preCICE on ubuntu 16.04
+
+# Using ubuntu 16.04 as basis
+FROM ubuntu:16.04
+
+# Installing necessary dependacies for preCICE
 RUN apt update && \
     apt install -y \
     build-essential \
@@ -6,29 +11,40 @@ RUN apt update && \
     libeigen3-dev \
     libxml2-dev \
     petsc-dev \
-    libboost-dev \
-    libboost-log-dev \
-    libboost-thread-dev \
-    libboost-system-dev \
-    libboost-filesystem-dev \
-    libboost-program-options-dev \
-    libboost-test-dev \
+    libpetsc3.6 \
     git \
-    python \
     python-numpy \
-    python-dev
+    python-dev \
+    wget \
+    bzip2 \
+    libbz2-dev
 
+# Installing boost from source
+RUN wget -nv https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.bz2 && \
+    tar -xf boost_1_66_0.tar.bz2 && \
+    cd boost_1_66_0/ && \
+    ./bootstrap.sh --with-libraries=log,thread,system,filesystem,program_options,test --prefix=/usr/local && \
+    ./b2 install && \
+    ldconfig
+
+# Setting some environment variables for installing preCICE
+ENV CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/usr/include/eigen3"
 ENV CPATH="/usr/include/eigen3:${CPATH}"
-ENV PETSC_DIR="/usr/lib/petscdir/3.7/"
+ENV PETSC_DIR="/usr/lib/petscdir/3.6.2/"
 ENV PETSC_ARCH="x86_64-linux-gnu-real"
 
-RUN useradd -ms /bin/bash alice
-USER alice
-
-WORKDIR /home/alice
+# Building preCICE
 RUN git clone https://github.com/precice/precice.git
 WORKDIR precice
-RUN scons petsc=off mpi=on python=off compiler="mpicxx" -j2
+# Some parameters for the build, you can set them in the build command e.g.
+# sudo docker build Dockerfile.precice --build-arg petsc_para=yes --build-arg mpi_para=yes .
+# this will result in
+# scons petsc=yes mpi=yes python=no compiler="mpicxx" -j2
+ARG petsc_para=no
+ARG mpi_para=yes
+ARG python_para=no
+RUN scons petsc=$petsc_para mpi=$mpi_para python=$python_para compiler="mpicxx" -j2
 
-ENV PRECICE_ROOT="/home/alice/precice"
-ENV LD_LIBRARY_PATH="/home/alice/precice/build/last:${LD_LIBRARY_PATH}"
+# Setting preCICE environment variables
+ENV PRECICE_ROOT="/precice"
+ENV LD_LIBRARY_PATH="/precice/build/last:${LD_LIBRARY_PATH}"
