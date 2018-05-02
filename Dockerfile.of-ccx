@@ -4,14 +4,14 @@
 FROM kunstrasenspringer/precice:latest
 
 USER root
+ENV USER=root
 
 # Installing necessary dependecies
 RUN apt-get update && apt-get install -y \
     software-properties-common \
-    wget \
+    curl \
     apt-transport-https \
     bzip2 \
-    libbz2-dev \
     cmake \
     automake \
     autoconf \
@@ -21,11 +21,11 @@ RUN apt-get update && apt-get install -y \
 
 # Installing OpenFOAM 4.1
 RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev" && \
-    sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -" && \
+    sh -c "curl -s http://dl.openfoam.org/gpg.key | apt-key add -" && \
     add-apt-repository http://dl.openfoam.org/ubuntu && apt update && \
     apt-get -y install openfoam4 --no-install-recommends
 
-ENV USER=root
+
 # RUN echo "source /opt/openfoam4/etc/bashrc" >> /root/.bashrc
 
 # Building openfoam-adapter
@@ -36,8 +36,7 @@ RUN . /opt/openfoam4/etc/bashrc && ./Allwmake
 
 # Downloading Calculix 2.12
 WORKDIR /
-RUN wget -nv http://www.dhondt.de/ccx_2.12.src.tar.bz2 && \
-    tar -xf ccx_2.12.src.tar.bz2
+RUN curl -s http://www.dhondt.de/ccx_2.12.src.tar.bz2 | tar -xj
 
 # Installing yaml-cpp
 RUN git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp
@@ -47,18 +46,16 @@ RUN mkdir build && cd build && cmake /yaml-cpp/ && make
 # Installing spooles
 WORKDIR /
 RUN mkdir spooles.2.2 && cd spooles.2.2 && \
-    wget -nv http://www.netlib.org/linalg/spooles/spooles.2.2.tgz && \
-    tar -xf spooles.2.2.tgz && cd /spooles.2.2/Tree/src/ && \
+    curl -s http://www.netlib.org/linalg/spooles/spooles.2.2.tgz | tar -xz && \
+    cd /spooles.2.2/Tree/src/ && \
     sed -i 's/drawTree/draw/g' makeGlobalLib && \
     cd /spooles.2.2/ && \
     sed -i "s#CC = /usr/lang-4.0/bin/cc#CC = /usr/bin/cc#g" Make.inc && \
     make lib && cd /spooles.2.2/MT/src/ && make
 
 # Downloading and installing ARPACK
-USER root
-RUN wget -nv http://www.caam.rice.edu/software/ARPACK/SRC/arpack96.tar.gz \
-    && tar xvzf arpack96.tar.gz \
-    && mv ARPACK /usr/local/ARPACK \
+RUN curl -s http://www.caam.rice.edu/software/ARPACK/SRC/arpack96.tar.gz | tar -xz && \
+    mv ARPACK /usr/local/ARPACK \
     && cd /usr/local/ARPACK \
     && sed -i 's/$(HOME)/\/usr\/local/g' ARmake.inc \
     && sed -i 's/\/bin\/make/make/g' ARmake.inc \
