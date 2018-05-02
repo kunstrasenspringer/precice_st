@@ -1,9 +1,9 @@
 # Specify the locations of: the original CCX source, SPOOLES and ARPACK
-CCX			= /home/alice/CalculiX/ccx_2.13/src
-SPOOLES			= /home/alice/spooles.2.2
+CCX			= /CalculiX/ccx_2.13/src
+SPOOLES			= /spooles.2.2
 ARPACK			= /usr/lib
-PRECICE_ROOT		= /home/alice/precice
-YAML            	= /home/alice/yaml-cpp
+PRECICE_ROOT		= /precice
+YAML            	= /yaml-cpp
 
 # Specify where to store the generated .o files
 OBJDIR 		= bin

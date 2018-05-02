@@ -1,84 +1,103 @@
+# System testing SU2-adapter and calculix-adapter for preCICE
+
+# Building on top of the latets preCICE-build
 FROM kunstrasenspringer/precice:latest
 
-USER root
+# Installing necessary dependecies
 RUN apt-get update && apt-get install -y \
-    wget \
-    bzip2 \
-    libbz2-dev \
     cmake \
     automake \
     autoconf \
     autotools-dev \
     libarpack2-dev
 
-USER alice
-WORKDIR /home/alice
-
+# Downloading CalculiX 2.13
 RUN wget -nv http://www.dhondt.de/ccx_2.13.src.tar.bz2 && \
     tar -xf ccx_2.13.src.tar.bz2
 
+# Installing yaml-cpp
 RUN git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp
-WORKDIR /home/alice/yaml-cpp
-RUN mkdir build && cd build && cmake /home/alice/yaml-cpp/ && make
+WORKDIR /yaml-cpp
+RUN mkdir build && cd build && cmake /yaml-cpp/ && make
 
-WORKDIR /home/alice/
+# Installing spooles
+WORKDIR /
 RUN mkdir spooles.2.2 && cd spooles.2.2 && \
     wget http://www.netlib.org/linalg/spooles/spooles.2.2.tgz && \
-    tar -xf spooles.2.2.tgz && cd /home/alice/spooles.2.2/Tree/src/ && \
+    tar -xf spooles.2.2.tgz && cd /spooles.2.2/Tree/src/ && \
     sed -i 's/drawTree/draw/g' makeGlobalLib && \
-    cd /home/alice/spooles.2.2/ && \
+    cd /spooles.2.2/ && \
     sed -i "s#CC = /usr/lang-4.0/bin/cc#CC = /usr/bin/cc#g" Make.inc && \
-    make lib && cd /home/alice/spooles.2.2/MT/src/ && make
+    make lib && cd /spooles.2.2/MT/src/ && make
 
-WORKDIR /home/alice/
+# Downloading and installing ARPACK
+RUN wget -nv http://www.caam.rice.edu/software/ARPACK/SRC/arpack96.tar.gz \
+    && tar xvzf arpack96.tar.gz \
+    && mv ARPACK /usr/local/ARPACK \
+    && cd /usr/local/ARPACK \
+    && sed -i 's/$(HOME)/\/usr\/local/g' ARmake.inc \
+    && sed -i 's/\/bin\/make/make/g' ARmake.inc \
+    && sed -i 's/f77/gfortran/g' ARmake.inc \
+    && sed -i 's/SUN4/INTEL/g' ARmake.inc \
+    && sed -i 's/-cg89//g' ARmake.inc \
+    && sed -i 's/      EXTERNAL           ETIME/*     EXTERNAL           ETIME/g' UTIL/second.f \
+    && make all
+
+# Building calculix-adapter
+WORKDIR /
 RUN git clone https://github.com/precice/calculix-adapter.git
-COPY Makefile_su2-ccx /home/alice/calculix-adapter/Makefile
-WORKDIR /home/alice/calculix-adapter/
+WORKDIR /calculix-adapter/
+RUN git fetch && git checkout v2.12
+COPY Makefile_of_ccx /calculix-adapter/Makefile
 RUN make
 
-ENV PATH="/home/alice/calculix-adapter/bin:${PATH}"
+ENV PATH="/calculix-adapter/bin:${PATH}"
 
-WORKDIR /home/alice
+# Downloading SU2 and SU2-adapter
+WORKDIR /
 RUN git clone https://github.com/su2code/SU2.git su2-source
 RUN git clone https://github.com/precice/su2-adapter.git
 
-ENV SU2_HOME="/home/alice/su2-source"
-ENV SU2_BIN="/home/alice/su2-bin"
-ENV SU2_RUN="/home/alice/su2-bin/bin"
-ENV PATH="/home/alice/su2-bin/bin:${PATH}"
-ENV PYTHONPATH="/home/alice/su2-bin/bin:${PYTHONPATH}"
+ENV SU2_HOME="/su2-source"
+ENV SU2_BIN="/su2-bin"
+ENV SU2_RUN="/su2-bin/bin"
+ENV PATH="/su2-bin/bin:${PATH}"
+ENV PYTHONPATH="/su2-bin/bin:${PYTHONPATH}"
 
-WORKDIR /home/alice/su2-adapter
+# Installing su2-adapter
+WORKDIR /su2-adapter
 RUN ./su2AdapterInstall
 
-WORKDIR /home/alice/su2-source
+WORKDIR /su2-source
 RUN ./configure --prefix=${SU2_BIN} CXXFLAGS="-std=c++11" --enable-mpi
 RUN make -j 2 install
 
-
-USER alice
-WORKDIR /home/alice/
+# Downloading tutorials
+WORKDIR /
 RUN git clone https://github.com/precice/tutorials.git
 
-WORKDIR /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
-COPY reducing_log_su2-ccx /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX
+# Simulating
+WORKDIR /tutorials/FSI/flap_perp/SU2-CalculiX
+COPY reducing_log_su2-ccx /tutorials/FSI/flap_perp/SU2-CalculiX
 USER root
 RUN ./reducing_log_su2-ccx; exit 0
 
-WORKDIR /home/alice/
-RUN mkdir Output_su2-ccx && cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flow*.vtk /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flap.cvg /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flap.dat /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flap.frd /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/flap.sta /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/convergence-Calculix.txt /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/forces_breakdown.dat /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/iterations-Calculix.txt /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/iterations-SU2_CFD.txt /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/point1.watchpoint.txt /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/restart_flow_*.dat /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/spooles.out /home/alice/Output_su2-ccx && \
-cp /home/alice/tutorials/FSI/flap_perp/SU2-CalculiX/surface_flow_*.csv /home/alice/Output_su2-ccx
+# Copying output files to a folder for further examination
+WORKDIR /
+RUN mkdir Output_su2-ccx && cp /tutorials/FSI/flap_perp/SU2-CalculiX/flow*.vtk /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/flap.cvg /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/flap.dat /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/flap.frd /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/flap.sta /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/convergence-Calculix.txt /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/forces_breakdown.dat /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/iterations-Calculix.txt /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/iterations-SU2_CFD.txt /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/point1.watchpoint.txt /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/restart_flow_*.dat /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/spooles.out /Output_su2-ccx && \
+cp /tutorials/FSI/flap_perp/SU2-CalculiX/surface_flow_*.csv /Output_su2-ccx
 
-COPY log_su2-ccx_docker.sh /home/alice/
+# Logging information about the build
+COPY log_su2-ccx_docker.sh /
 RUN sh log_su2-ccx_docker.sh
