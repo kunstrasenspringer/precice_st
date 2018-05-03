@@ -1,7 +1,10 @@
-# System testing openfoam-adapter for preCICE
+# System testing preCICE with openfoam-adapter
 
 # Using latest preCICE from dockerhub.com
 FROM precice:latest
+
+USER root
+ENV USER=root
 
 # Install dependecies
 RUN apt-get update && apt-get install -y \
@@ -15,10 +18,8 @@ RUN sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
 RUN add-apt-repository http://dl.openfoam.org/ubuntu && apt update
 RUN apt-get -y install openfoam4 --no-install-recommends
 
-ENV USER=root
-
 # Building openfoam-adapter
-WORkDIR /
+WORKDIR /
 RUN git clone https://github.com/precice/openfoam-adapter.git
 WORKDIR /openfoam-adapter
 RUN . /opt/openfoam4/etc/bashrc && ./Allwmake

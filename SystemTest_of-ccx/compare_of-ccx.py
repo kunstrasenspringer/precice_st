@@ -2,7 +2,7 @@
 import subprocess
 import os
 
-pathToTest1 = os.getcwd() + '/ref_of-ccx/'
+pathToTest1 = os.getcwd() + '/referenceOutput_of-ccx/'
 pathToTest2 = os.getcwd() + '/Output_of-ccx/'
 
 os.chdir(pathToTest1)

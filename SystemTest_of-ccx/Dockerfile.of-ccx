@@ -1,4 +1,4 @@
-# System testing openfoam-adapter and calculix-adapter for preCICE
+# System testing preCICE with openfoam-adapter and calculix-adapter 
 
 # Building on top of the latets preCICE-build
 FROM kunstrasenspringer/precice:latest
@@ -11,7 +11,6 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     curl \
     apt-transport-https \
-    bzip2 \
     cmake \
     automake \
     autoconf \

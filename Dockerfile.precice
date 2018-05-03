@@ -14,8 +14,7 @@ RUN apt update && apt install -y \
     python-numpy \
     python-dev \
     wget \
-    bzip2 \
-    libbz2-dev
+    bzip2
 
 # Installing boost from source
 RUN wget -nv https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.bz2 && \
@@ -26,10 +25,10 @@ RUN wget -nv https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.
     ldconfig
 
 # Setting some environment variables for installing preCICE
-ENV CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/usr/include/eigen3" \
-    CPATH="/usr/include/eigen3:${CPATH}"
-ENV PETSC_DIR="/usr/lib/petscdir/3.6.2/" \
-    PETSC_ARCH="x86_64-linux-gnu-real"
+ENV CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/usr/include/eigen3"
+ENV CPATH="/usr/include/eigen3:${CPATH}"
+ENV PETSC_DIR="/usr/lib/petscdir/3.6.2/"
+ENV PETSC_ARCH="x86_64-linux-gnu-real"
 
 # Building preCICE
 RUN git clone https://github.com/precice/precice.git
@@ -44,7 +43,6 @@ ARG python_para=no
 RUN scons petsc=$petsc_para mpi=$mpi_para python=$python_para -j2
 
 # Setting preCICE environment variables
-ENV PRECICE_ROOT="/precice" \
-    LD_LIBRARY_PATH="$PRECICE_ROOT/build/last:${LD_LIBRARY_PATH}" \
-    LIBRARY_PATH="$PRECICE_ROOT/build/last:${LIBRARY_PATH}"
-
+ENV PRECICE_ROOT="/precice" 
+ENV LD_LIBRARY_PATH="$PRECICE_ROOT/build/last:${LD_LIBRARY_PATH}"
+ENV LIBRARY_PATH="$PRECICE_ROOT/build/last:${LIBRARY_PATH}"

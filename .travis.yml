@@ -12,32 +12,35 @@ jobs:
     - docker push $DOCKER_USERNAME/precice
   - stage: System Tests
     script:
-    - docker build -f Dockerfile.su2-ccx -t su2-ccx .
+    - cd precice_st/SystemTest_su2-ccx/
+    - docker build -t su2-ccx -f Dockerfile.su2-ccx .
     - docker run -it -d --name su2-ccx_container su2-ccx
-    - docker cp su2-ccx_container:/home/alice/Output_su2-ccx .
+    - docker cp su2-ccx_container:/Output_su2-ccx .
     - python compare_su2-ccx.py
     after_failure:
-    - docker cp su2-ccx_container:/home/alice/log_su2-ccx .
-    - sh log_su2-ccx_travis.sh
-    - sh push.sh Output_su2-ccx
+    - docker cp su2-ccx_container:log_su2-ccx .
+    - sh /precice_st/SystemTest_su2-ccx/log_su2-ccx_travis.sh
+    - sh /precice_st/SystemTest_su2-ccx/push_su2-ccx.sh Output_su2-ccx
   - script:
-    - docker build -f Dockerfile.of-of -t of-of .
+    - cd precice_st/SystemTest_of-of/
+    - docker build -t of-of -f Dockerfile.of-of .
     - docker run -it -d --name of-of_container of-of
-    - docker cp of-of_container:/home/alice/Output_of-of .
+    - docker cp of-of_container:Output_of-of .
     - python compare_of-of.py
     after_failure:
-    - docker cp of-of_container:/home/alice/log_of-of .
-    - sh log_of-of_travis.sh
-    - sh push_of-of.sh Output_of-of
+    - docker cp of-of_container:log_of-of .
+    - sh /precice_st/SystemTest_of-of/log_of-of_travis.sh
+    - sh /precice_st/SystemTest_of-of/push_of-of.sh Output_of-of
   - script:
-    - docker build -f Dockerfile.of-ccx -t of-ccx .
+    - cd precice_st/SystemTest_of-ccx/
+    - docker build -t of-ccx -f Dockerfile.of-ccx .
     - docker run -it -d --name of-ccx_container of-ccx
-    - docker cp of-ccx_container:/home/alice/Output_of-ccx .
+    - docker cp of-ccx_container:Output_of-ccx .
     - python compare_of-ccx.py
     after_failure:
-    - docker cp of-ccx_container:/home/alice/log_of-ccx .
-    - sh log_of-ccx_travis.sh
-    - sh push_of-ccx.sh Output_of-ccx
+    - docker cp of-ccx_container:log_of-ccx .
+    - sh /precice_st/SystemTest_of-ccx/log_of-ccx_travis.sh
+    - sh /precice_st/SystemTest_of-ccx/push_of-ccx.sh Output_of-ccx
 env:
   global:
     secure: rM4naaBFg4a3v6NacTd7BbZ9LYuLFs4Pgqe9lYM6fZtg7hNCosf1WP26mn/P7MgCoCB6S3LvMFPiCXAcs5wYT2FJk4aKGfUC1X3umO938CJOWGTSbhkmI5BvutksOOtyDR57URlj8pBsYVOMU1QE8to33crFXo3QEm/1DLtsgHOpRBjqhDaNh44RdzbjpN5fmZFJWOXPx+v+IXOngrdrxHAy8N0nR95oBPuFz8tgLswvmYUvQRlX2l3Ku1XNxLzp7YeviLVb7t3czf3p1B6pttSqtgrkRQ5kXPPNz5XmKWnGgkRsGzTWHqiKAkraRzOz0OS66/EjGk7MAKVAkRoLtOeYDDfmMn+Z3qQ9XwCC8WhnyQSdz6s+/oWqw+tF0ErT65azbZ0iOzgsXOmGTp4ai5TNWbXd1/vMErHHy7GPghUm2gKusAbtaUgi0Zj+GyRUGiU0Vxemm1mLFGKPpuP+B+1M5zWIDWN11DROewK1Fm8xsJ2gF8+//8o/Xau2niO+ZfTje2mP7SOjZiJJM6Qo7HN/KMecK27BRPbDm+LekTc5U6IViyoI2fHt/6sUpLsGphaKClMW3513leacGjYJZW1d8K9vjbBcfvF4TevCztgkW7Vz3hrQlkBDL0Ghr8vefl5JYKDf/JJ7O08noSyMSGC0ueupz6iw+mojuhOPz2c=

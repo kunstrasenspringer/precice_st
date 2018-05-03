@@ -1,39 +1,43 @@
-# System testing SU2-adapter and calculix-adapter for preCICE
+# System testing preCICE with SU2-adapter and calculix-adapter
 
-# Building on top of the latets preCICE-build
-FROM kunstrasenspringer/precice:latest
+# Building on top of the latest preCICE-build
+FROM precice:latest
+
+USER root
+ENV USER=root
 
 # Installing necessary dependecies
 RUN apt-get update && apt-get install -y \
     cmake \
+    curl \
     automake \
     autoconf \
     autotools-dev \
     libarpack2-dev
 
 # Downloading CalculiX 2.13
-RUN wget -nv http://www.dhondt.de/ccx_2.13.src.tar.bz2 && \
-    tar -xf ccx_2.13.src.tar.bz2
+WORKDIR /
+RUN curl -s http://www.dhondt.de/ccx_2.13.src.tar.bz2 | tar -xj
 
 # Installing yaml-cpp
-RUN git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp
-WORKDIR /yaml-cpp
-RUN mkdir build && cd build && cmake /yaml-cpp/ && make
+WORKDIR /
+RUN git clone https://github.com/jbeder/yaml-cpp.git yaml-cpp && cd yaml-cpp/ && \
+    mkdir build && cd build && cmake /yaml-cpp/ && make
 
 # Installing spooles
 WORKDIR /
 RUN mkdir spooles.2.2 && cd spooles.2.2 && \
-    wget http://www.netlib.org/linalg/spooles/spooles.2.2.tgz && \
-    tar -xf spooles.2.2.tgz && cd /spooles.2.2/Tree/src/ && \
+    curl -s http://www.netlib.org/linalg/spooles/spooles.2.2.tgz | tar -xz && \
+    cd /spooles.2.2/Tree/src/ && \
     sed -i 's/drawTree/draw/g' makeGlobalLib && \
     cd /spooles.2.2/ && \
     sed -i "s#CC = /usr/lang-4.0/bin/cc#CC = /usr/bin/cc#g" Make.inc && \
     make lib && cd /spooles.2.2/MT/src/ && make
 
 # Downloading and installing ARPACK
-RUN wget -nv http://www.caam.rice.edu/software/ARPACK/SRC/arpack96.tar.gz \
-    && tar xvzf arpack96.tar.gz \
-    && mv ARPACK /usr/local/ARPACK \
+WORKDIR /
+RUN curl -s http://www.caam.rice.edu/software/ARPACK/SRC/arpack96.tar.gz | tar -xz && \
+    mv ARPACK /usr/local/ARPACK \
     && cd /usr/local/ARPACK \
     && sed -i 's/$(HOME)/\/usr\/local/g' ARmake.inc \
     && sed -i 's/\/bin\/make/make/g' ARmake.inc \
@@ -47,15 +51,15 @@ RUN wget -nv http://www.caam.rice.edu/software/ARPACK/SRC/arpack96.tar.gz \
 WORKDIR /
 RUN git clone https://github.com/precice/calculix-adapter.git
 WORKDIR /calculix-adapter/
-RUN git fetch && git checkout v2.12
-COPY Makefile_of_ccx /calculix-adapter/Makefile
+COPY Makefile_su2-ccx /calculix-adapter/Makefile
 RUN make
 
 ENV PATH="/calculix-adapter/bin:${PATH}"
 
 # Downloading SU2 and SU2-adapter
 WORKDIR /
-RUN git clone https://github.com/su2code/SU2.git su2-source
+RUN git clone https://github.com/su2code/SU2.git su2-source && cd su2-source && \
+    git fetch && git checkout v6.0.0 && cd ..
 RUN git clone https://github.com/precice/su2-adapter.git
 
 ENV SU2_HOME="/su2-source"
