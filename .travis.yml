@@ -6,7 +6,7 @@ jobs:
     script:
     - docker build -f Dockerfile.precice -t precice .
     after_success:
-    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker images
     - docker tag precice $DOCKER_USERNAME/precice
     - docker push $DOCKER_USERNAME/precice
