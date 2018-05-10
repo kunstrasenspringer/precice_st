@@ -1,22 +1,20 @@
 #!/usr/bin/env python
-import subprocess
 import os
+import filecmp
 
-pathToTest1 = os.getcwd() + '/ref_su2-ccx/'
-pathToTest2 = os.getcwd() + '/Output_su2-ccx/'
+pathToRef = os.getcwd() + '/referenceOutput_su2-ccx/'
+pathToOutput = os.getcwd() + '/Output_su2-ccx/'
 
-fileListTest1 = os.listdir(pathToTest1)
-fileListTest2 = os.listdir(pathToTest2)
+fileListRef = os.listdir(pathToRef)
+fileListOutput = os.listdir(pathToOutput)
 
-fileListTest1.sort()
-fileListTest2.sort()
+fileListRef.sort()
+fileListOutput.sort()
 
 def comparison():
-    for x, y in zip(fileListTest1, fileListTest2):
-        if subprocess.call(['diff', '-y', pathToTest1 + x, pathToTest2 + y]) != 0:
-            print ('diff ' + pathToTest1 + x + ' ' + pathToTest2 + y)
-            return -1
-
+    for x, y in zip(fileListRef, fileListOutput):
+        if not filecmp.cmp(pathToRef + x, pathToOutput + y):
+            raise Exception('Output differs from reference')
 
 if __name__ == "__main__":
-    comparison
+    comparison()

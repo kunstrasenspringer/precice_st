@@ -1,7 +1,7 @@
 # System testing preCICE with openfoam-adapter
 
 # Using latest preCICE from dockerhub.com
-FROM kunstrasenspringer/precice:latest
+FROM precice:latest
 
 USER root
 ENV USER=root
@@ -31,5 +31,5 @@ RUN . /opt/openfoam4/etc/bashrc; ./Allrun
 # Copying output files to a folder for further examination
 WORKDIR /
 RUN mkdir Output_of-of && \
-    cp /openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Solid.log /Output_of-of && \
-    cp /openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Fluid.log /Output_of-of
+    cp -r /openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Solid/ /Output_of-of && \
+    cp -r /openfoam-adapter/tutorials/CHT/flow-over-plate/buoyantPimpleFoam-laplacianFoam/Fluid/ /Output_of-of

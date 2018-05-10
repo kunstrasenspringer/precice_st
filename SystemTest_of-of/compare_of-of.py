@@ -1,26 +1,20 @@
 #!/usr/bin/env python
-import subprocess
 import os
+import filecmp
 
-pathToTest1 = os.getcwd() + '/ref_of-of/'
-pathToTest2 = os.getcwd() + '/Output_of-of/'
+def comparison(pathToRef, pathToOutput):
+    fileListRef = os.listdir(pathToRef)
+    fileListOutput = os.listdir(pathToOutput)
 
-os.chdir(pathToTest2)
-subprocess.call(['sed', '-i', '-e', '1,20d', 'Fluid.log'])
-subprocess.call(['sed', '-i', '-e', '1,20d', 'Solid.log'])
+    fileListRef.sort()
+    fileListOutput.sort()
 
-fileListTest1 = os.listdir(pathToTest1)
-fileListTest2 = os.listdir(pathToTest2)
-
-fileListTest1.sort()
-fileListTest2.sort()
-
-def comparison():
-    for x, y in zip(fileListTest1, fileListTest2):
-        #print ('diff ' + pathToTest1 + x + ' ' + pathToTest2 + y)
-        if subprocess.call(['diff', '-y', pathToTest1 + x, pathToTest2 + y]) != 0:
-            subprocess.call(['exit', '-1'])
-
+    for x, y in zip(fileListRef, fileListOutput):
+        if os.path.isdir(pathToRef+x):
+            comparison(pathToRef+x+'/',pathToOutput+y+'/')
+        else:
+            if not filecmp.cmp(pathToRef + x, pathToOutput + y):
+                raise Exception('Output differs from reference')
 
 if __name__ == "__main__":
-    comparison()
+    comparison(os.getcwd() + '/referenceOutput_of-of/', os.getcwd() + '/Output_of-of/')
