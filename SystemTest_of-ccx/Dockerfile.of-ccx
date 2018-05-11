@@ -1,7 +1,7 @@
 # System testing preCICE with openfoam-adapter and calculix-adapter
 
 # Building on top of the latets preCICE-build
-FROM precice:latest
+FROM kunstrasenspringer/precice:latest
 
 USER root
 ENV USER=root
@@ -85,12 +85,12 @@ COPY controlDict /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Inner-
 COPY controlDict /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid/system/controlDict
 
 # Simulating
-WORKDIR /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
-RUN . /opt/openfoam4/etc/bashrc && ./Allrun
+# WORKDIR /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
+# RUN . /opt/openfoam4/etc/bashrc && ./Allrun
 
-# COPY reducing_log_of-ccx /tutorials/FSI/flap_perp/SU2-CalculiX
-# RUN ./reducing_log_of-ccx
-#
+COPY reducing_log_of-ccx /tutorials/FSI/flap_perp/SU2-CalculiX
+RUN ./reducing_log_of-ccx
+
 # Copy output to folder Output for further examination
 WORKDIR /
 RUN mkdir Output_of-ccx && \
@@ -98,4 +98,4 @@ RUN mkdir Output_of-ccx && \
     cp -r /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Inner-Fluid/ /Output_of-ccx && \
     cp -r /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid/ /Output_of-ccx
 
-RUN apt-get install -y gdb 
+# RUN apt-get install -y gdb
