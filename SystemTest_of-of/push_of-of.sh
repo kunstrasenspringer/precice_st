@@ -38,7 +38,7 @@ setup_git() {
 }
 
 commit_files() {
-  git pull
+  git pull --allow-unrelated-histories
   git checkout master
   if [ -d "$output" ]
   then
