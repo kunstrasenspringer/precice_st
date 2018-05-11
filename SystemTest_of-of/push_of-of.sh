@@ -33,8 +33,8 @@ OF_ADAPTER_VERSION="OpenFOAM-adapter version: "$OF_ADAPTER_VERSION
 echo $OF_ADAPTER_VERSION >> log_of-of
 
 setup_git() {
-  git config --global user.email "travis@travis-ci.org"
-  git config --global user.name "Travis CI"
+  git config --local user.email "travis@travis-ci.org"
+  git config --local user.name "Travis CI"
 }
 
 commit_files() {

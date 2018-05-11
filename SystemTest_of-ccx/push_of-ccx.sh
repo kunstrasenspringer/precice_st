@@ -48,8 +48,8 @@ echo $TUTORIALS_VERSION >> log_of-ccx
 
 
 setup_git() {
-  git config --global user.email "travis@travis-ci.org"
-  git config --global user.name "Travis CI"
+  git config --local user.email "travis@travis-ci.org"
+  git config --local user.name "Travis CI"
 }
 
 commit_files() {
