@@ -60,7 +60,7 @@ commit_files() {
 
 upload_files() {
   git remote set-url origin https://${GH_TOKEN}@github.com/kunstrasenspringer/travis_test.git > /dev/null 2>&1
-	git pull
+	git pull --allow-unrelated-histories
 	git push --quiet --set-upstream origin master
 }
 
