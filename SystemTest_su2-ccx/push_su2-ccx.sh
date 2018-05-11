@@ -1,4 +1,5 @@
 #!/bin/sh
+set -x
 # pushes generated output files back to github, if output files != ref files
 output=$1
 
