@@ -2,19 +2,19 @@
 import os
 import filecmp
 
-pathToRef = os.getcwd() + '/referenceOutput_of-ccx/'
-pathToOutput = os.getcwd() + '/Output_of-ccx/'
+def comparison(pathToRef, pathToOutput):
+    fileListRef = os.listdir(pathToRef)
+    fileListOutput = os.listdir(pathToOutput)
 
-fileListRef = os.listdir(pathToRef)
-fileListOutput = os.listdir(pathToOutput)
+    fileListRef.sort()
+    fileListOutput.sort()
 
-fileListRef.sort()
-fileListOutput.sort()
-
-def comparison():
     for x, y in zip(fileListRef, fileListOutput):
-        if not filecmp.cmp(pathToRef + x, pathToOutput + y):
-            raise Exception('Output differs from reference')
+        if os.path.isdir(pathToRef+x):
+            comparison(pathToRef+x+'/',pathToOutput+y+'/')
+        else:
+            if not filecmp.cmp(pathToRef + x, pathToOutput + y):
+                raise Exception('Output differs from reference')
 
 if __name__ == "__main__":
-    comparison()
+    comparison(os.getcwd() + '/referenceOutput_of-ccx/', os.getcwd() + '/Output_of-ccx/')
