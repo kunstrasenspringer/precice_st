@@ -88,7 +88,7 @@ COPY controlDict /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-
 # WORKDIR /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
 # RUN . /opt/openfoam4/etc/bashrc && ./Allrun
 
-COPY reducing_log_of-ccx /tutorials/FSI/flap_perp/SU2-CalculiX
+COPY reducing_log_of-ccx /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
 RUN ./reducing_log_of-ccx
 
 # Copy output to folder Output for further examination
