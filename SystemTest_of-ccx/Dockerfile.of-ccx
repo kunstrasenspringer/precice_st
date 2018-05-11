@@ -94,7 +94,6 @@ RUN ./reducing_log_of-ccx
 # Copy output to folder Output for further examination
 WORKDIR /
 RUN mkdir Output_of-ccx && \
-    cp -r /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Solid/ /Output_of-ccx && \
     cp -r /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Inner-Fluid/ /Output_of-ccx && \
     cp -r /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid/ /Output_of-ccx
 

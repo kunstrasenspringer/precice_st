@@ -2,8 +2,8 @@
 import os
 import filecmp
 
-pathToRef = os.getcwd() + '/referenceOutput_su2-ccx/'
-pathToOutput = os.getcwd() + '/Output_su2-ccx/'
+pathToRef = os.getcwd() + '/referenceOutput_of-ccx/'
+pathToOutput = os.getcwd() + '/Output_of-ccx/'
 
 fileListRef = os.listdir(pathToRef)
 fileListOutput = os.listdir(pathToOutput)
