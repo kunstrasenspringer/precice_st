@@ -1,32 +1,20 @@
 #!/usr/bin/env python
-import subprocess
 import os
+import filecmp
 
-pathToTest1 = os.getcwd() + '/referenceOutput_of-ccx/'
-pathToTest2 = os.getcwd() + '/Output_of-ccx/'
+pathToRef = os.getcwd() + '/referenceOutput_su2-ccx/'
+pathToOutput = os.getcwd() + '/Output_su2-ccx/'
 
-os.chdir(pathToTest1)
-subprocess.call(['sed', '-i', '-e', '1,110d', 'Fluid.log'])
-subprocess.call(['sed', '-i', '-e', '1,75d', 'Solid.log'])
+fileListRef = os.listdir(pathToRef)
+fileListOutput = os.listdir(pathToOutput)
 
-os.chdir(pathToTest2)
-subprocess.call(['sed', '-i', '-e', '1,110d', 'Fluid.log'])
-subprocess.call(['sed', '-i', '-e', '1,75d', 'Solid.log'])
-
-
-fileListTest1 = os.listdir(pathToTest1)
-fileListTest2 = os.listdir(pathToTest2)
-
-fileListTest1.sort()
-fileListTest2.sort()
+fileListRef.sort()
+fileListOutput.sort()
 
 def comparison():
-    for x, y in zip(fileListTest1, fileListTest2):
-        #print ('diff ' + pathToTest1 + x + ' ' + pathToTest2 + y)
-        if subprocess.call(['diff', '-y', pathToTest1 + x, pathToTest2 + y]) != 0:
-            print('fail')
-            return -1
-
+    for x, y in zip(fileListRef, fileListOutput):
+        if not filecmp.cmp(pathToRef + x, pathToOutput + y):
+            raise Exception('Output differs from reference')
 
 if __name__ == "__main__":
     comparison()

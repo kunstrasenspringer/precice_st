@@ -1,5 +1,12 @@
 sudo: true
 dist: trusty
+notifications:
+  email:
+    recipients:
+      - kunstrasenspringer@gmx.net
+      - kunstrasenspringer@googlemail.com
+    on_success: never # default: change
+    on_failure: always # default: always
 jobs:
   include:
   - stage: Building preCICE
@@ -17,30 +24,30 @@ jobs:
     - docker run -it -d --name su2-ccx_container su2-ccx
     - docker cp su2-ccx_container:/Output_su2-ccx .
     - python compare_su2-ccx.py
+    after_success:
+    - sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/push_su2-ccx.sh
     after_failure:
-    - docker cp su2-ccx_container:log_su2-ccx .
-    - sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/log_su2-ccx_travis.sh
-    - sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/push_su2-ccx.sh Output_su2-ccx
+    - sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/push_su2-ccx.sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/Output_su2-ccx
   - script:
     - cd $TRAVIS_BUILD_DIR/SystemTest_of-of/
     - docker build -t of-of -f Dockerfile.of-of .
     - docker run -it -d --name of-of_container of-of
     - docker cp of-of_container:Output_of-of .
     - python compare_of-of.py
+    after_success:
+    - sh $TRAVIS_BUILD_DIR/SystemTest_of-of/push_of-of.sh
     after_failure:
-    - docker cp of-of_container:log_of-of .
-    - sh $TRAVIS_BUILD_DIR/SystemTest_of-of/log_of-of_travis.sh
-    - sh $TRAVIS_BUILD_DIR/SystemTest_of-of/push_of-of.sh Output_of-of
+    - sh $TRAVIS_BUILD_DIR/SystemTest_of-of/push_of-of.sh $TRAVIS_BUILD_DIR/SystemTest_of-of/Output_of-of
   - script:
     - cd $TRAVIS_BUILD_DIR/SystemTest_of-ccx/
     - docker build -t of-ccx -f Dockerfile.of-ccx .
     - docker run -it -d --name of-ccx_container of-ccx
     - docker cp of-ccx_container:Output_of-ccx .
     - python compare_of-ccx.py
+    after_success:
+    - sh $TRAVIS_BUILD_DIR/SystemTest_of-ccx/push_of-ccx.sh
     after_failure:
-    - docker cp of-ccx_container:log_of-ccx .
-    - sh $TRAVIS_BUILD_DIR/SystemTest_of-ccx/log_of-ccx_travis.sh
-    - sh $TRAVIS_BUILD_DIR/SystemTest_of-ccx/push_of-ccx.sh Output_of-ccx
+    - sh $TRAVIS_BUILD_DIR/SystemTest_of-ccx/push_of-ccx.sh $TRAVIS_BUILD_DIR/SystemTest_of-ccx/Output_of-ccx
 env:
   global:
     secure: rM4naaBFg4a3v6NacTd7BbZ9LYuLFs4Pgqe9lYM6fZtg7hNCosf1WP26mn/P7MgCoCB6S3LvMFPiCXAcs5wYT2FJk4aKGfUC1X3umO938CJOWGTSbhkmI5BvutksOOtyDR57URlj8pBsYVOMU1QE8to33crFXo3QEm/1DLtsgHOpRBjqhDaNh44RdzbjpN5fmZFJWOXPx+v+IXOngrdrxHAy8N0nR95oBPuFz8tgLswvmYUvQRlX2l3Ku1XNxLzp7YeviLVb7t3czf3p1B6pttSqtgrkRQ5kXPPNz5XmKWnGgkRsGzTWHqiKAkraRzOz0OS66/EjGk7MAKVAkRoLtOeYDDfmMn+Z3qQ9XwCC8WhnyQSdz6s+/oWqw+tF0ErT65azbZ0iOzgsXOmGTp4ai5TNWbXd1/vMErHHy7GPghUm2gKusAbtaUgi0Zj+GyRUGiU0Vxemm1mLFGKPpuP+B+1M5zWIDWN11DROewK1Fm8xsJ2gF8+//8o/Xau2niO+ZfTje2mP7SOjZiJJM6Qo7HN/KMecK27BRPbDm+LekTc5U6IViyoI2fHt/6sUpLsGphaKClMW3513leacGjYJZW1d8K9vjbBcfvF4TevCztgkW7Vz3hrQlkBDL0Ghr8vefl5JYKDf/JJ7O08noSyMSGC0ueupz6iw+mojuhOPz2c=

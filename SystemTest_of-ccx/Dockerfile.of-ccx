@@ -1,7 +1,7 @@
-# System testing preCICE with openfoam-adapter and calculix-adapter 
+# System testing preCICE with openfoam-adapter and calculix-adapter
 
 # Building on top of the latets preCICE-build
-FROM kunstrasenspringer/precice:latest
+FROM precice:latest
 
 USER root
 ENV USER=root
@@ -74,7 +74,7 @@ RUN make
 
 ENV PATH="/calculix-adapter/bin:${PATH}"
 
-# Downloading tutorial and meshes and set endTime to 20.0
+# Downloading tutorial and meshes and set endTime to 5.0
 WORKDIR /
 RUN git clone https://github.com/precice/tutorials.git
 WORKDIR /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
@@ -88,15 +88,14 @@ COPY controlDict /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-
 WORKDIR /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
 RUN . /opt/openfoam4/etc/bashrc && ./Allrun
 
-
-### below Code for travis, but first the above code should work.
-
 # COPY reducing_log_of-ccx /tutorials/FSI/flap_perp/SU2-CalculiX
 # RUN ./reducing_log_of-ccx
 #
-# # Copy output to folder Output for further examination
-# WORKDIR /
-# RUN mkdir Output_of-ccx && \
-#     cp /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Solid.log /Output_of-ccx && \
-#     cp /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Inner-Fluid.log /Output_of-ccx && \
-#     cp /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid.log /Output_of-ccx
+# Copy output to folder Output for further examination
+WORKDIR /
+RUN mkdir Output_of-ccx && \
+    cp -r /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Solid/ /Output_of-ccx && \
+    cp -r /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Inner-Fluid/ /Output_of-ccx && \
+    cp -r /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-Fluid/ /Output_of-ccx
+
+RUN apt-get install -y gdb 

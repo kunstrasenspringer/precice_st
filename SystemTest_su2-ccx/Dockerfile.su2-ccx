@@ -91,7 +91,6 @@ WORKDIR /
 RUN mkdir Output_su2-ccx && cp /tutorials/FSI/flap_perp/SU2-CalculiX/flow*.vtk /Output_su2-ccx && \
 cp /tutorials/FSI/flap_perp/SU2-CalculiX/flap.cvg /Output_su2-ccx && \
 cp /tutorials/FSI/flap_perp/SU2-CalculiX/flap.dat /Output_su2-ccx && \
-cp /tutorials/FSI/flap_perp/SU2-CalculiX/flap.frd /Output_su2-ccx && \
 cp /tutorials/FSI/flap_perp/SU2-CalculiX/flap.sta /Output_su2-ccx && \
 cp /tutorials/FSI/flap_perp/SU2-CalculiX/convergence-Calculix.txt /Output_su2-ccx && \
 cp /tutorials/FSI/flap_perp/SU2-CalculiX/forces_breakdown.dat /Output_su2-ccx && \
@@ -101,7 +100,3 @@ cp /tutorials/FSI/flap_perp/SU2-CalculiX/point1.watchpoint.txt /Output_su2-ccx &
 cp /tutorials/FSI/flap_perp/SU2-CalculiX/restart_flow_*.dat /Output_su2-ccx && \
 cp /tutorials/FSI/flap_perp/SU2-CalculiX/spooles.out /Output_su2-ccx && \
 cp /tutorials/FSI/flap_perp/SU2-CalculiX/surface_flow_*.csv /Output_su2-ccx
-
-# Logging information about the build
-COPY log_su2-ccx_docker.sh /
-RUN sh log_su2-ccx_docker.sh

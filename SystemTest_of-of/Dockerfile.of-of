@@ -1,7 +1,7 @@
 # System testing preCICE with openfoam-adapter
 
 # Using latest preCICE from dockerhub.com
-FROM precice:latest
+FROM kunstrasenspringer/precice:latest
 
 USER root
 ENV USER=root
