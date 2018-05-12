@@ -22,7 +22,7 @@ trap 'error_handler' ERR
 
 # Set up a repeating loop to send some output to Travis.
 
-bash -c "while true; do echo \$(date) - building ...; sleep $PING_SLEEP; done" &
+bash -c "while true; do echo \$(date) - simulating ...; sleep $PING_SLEEP; done" &
 PING_LOOP_PID=$!
 
 SU2_CFD euler_config_coupled.cfg >> $BUILD_OUTPUT 2>&1 & ccx_preCICE -i flap -precice-participant Calculix >> $BUILD_OUTPUT 2>&1
