@@ -19,31 +19,19 @@ jobs:
     - docker push $DOCKER_USERNAME/precice
   - stage: System Tests
     script:
-    - cd $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/
-    - docker build -t su2-ccx -f Dockerfile.su2-ccx .
-    - docker run -it -d --name su2-ccx_container su2-ccx
-    - docker cp su2-ccx_container:/Output_su2-ccx .
-    - python compare_su2-ccx.py
+    - python system_testing.py su2-ccx
     after_success:
     - sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/push_su2-ccx.sh
     after_failure:
     - sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/push_su2-ccx.sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/Output_su2-ccx
   - script:
-    - cd $TRAVIS_BUILD_DIR/SystemTest_of-of/
-    - docker build -t of-of -f Dockerfile.of-of .
-    - docker run -it -d --name of-of_container of-of
-    - docker cp of-of_container:Output_of-of .
-    - python compare_of-of.py
+    - python system_testing.py of-of
     after_success:
     - sh $TRAVIS_BUILD_DIR/SystemTest_of-of/push_of-of.sh
     after_failure:
     - sh $TRAVIS_BUILD_DIR/SystemTest_of-of/push_of-of.sh $TRAVIS_BUILD_DIR/SystemTest_of-of/Output_of-of
   - script:
-    - cd $TRAVIS_BUILD_DIR/SystemTest_of-ccx/
-    - docker build -t of-ccx -f Dockerfile.of-ccx .
-    - docker run -it -d --name of-ccx_container of-ccx
-    - docker cp of-ccx_container:Output_of-ccx .
-    - python compare_of-ccx.py
+    - python system_testing.py of-ccx
     after_success:
     - sh $TRAVIS_BUILD_DIR/SystemTest_of-ccx/push_of-ccx.sh
     after_failure:
