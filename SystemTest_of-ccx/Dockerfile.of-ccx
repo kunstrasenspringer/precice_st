@@ -24,9 +24,6 @@ RUN add-apt-repository "http://dl.openfoam.org/ubuntu dev" && \
     add-apt-repository http://dl.openfoam.org/ubuntu && apt update && \
     apt-get -y install openfoam4 --no-install-recommends
 
-
-# RUN echo "source /opt/openfoam4/etc/bashrc" >> /root/.bashrc
-
 # Building openfoam-adapter
 WORKDIR /
 RUN git clone https://github.com/precice/openfoam-adapter.git
@@ -88,6 +85,7 @@ COPY controlDict /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX/Outer-
 # WORKDIR /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
 # RUN . /opt/openfoam4/etc/bashrc && ./Allrun
 
+# Simulating with reduced output for travis ci
 COPY reducing_log_of-ccx /tutorials/CHT/heat_exchanger/buoyantSimpleFoam-CalculiX
 RUN ./reducing_log_of-ccx
 
