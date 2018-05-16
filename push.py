@@ -23,7 +23,7 @@ import subprocess
 import time
 
 if __name__ == "__main__":
-    success = sys.argv[1] # success = 0 -> Output!=Reference, else -> Output==Reference
+    success = bool(sys.argv[1]) # success = 0 -> Output!=Reference, else -> Output==Reference
     systest = sys.argv[2]
 
     # Creating new logfile. if it exists, truncate content.
@@ -60,7 +60,8 @@ if __name__ == "__main__":
     # Setting up git user.
     subprocess.call(["git config --local user.email \"travis@travis-ci.org\""], shell=True)
     subprocess.call(["git config --local user.name \"Travis CI\""], shell=True)
-    if success == 0:
+    
+    if not success:
         # Move ouput to local repository.
         subprocess.call(["mv ${TRAVIS_BUILD_DIR}/SystemTest_"+systest+"/Output_"+systest+" ${TRAVIS_BUILD_DIR}/precice_st_output"], shell=True)
         subprocess.call(["mv ${TRAVIS_BUILD_DIR}/log_"+systest+" ${TRAVIS_BUILD_DIR}/precice_st_output"], shell=True)
