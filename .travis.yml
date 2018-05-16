@@ -9,14 +9,14 @@ notifications:
     on_failure: always
 jobs:
   include:
-  - stage: Building preCICE
-    script:
-    - docker build -f Dockerfile.precice -t precice .
-    after_success:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - docker images
-    - docker tag precice $DOCKER_USERNAME/precice
-    - docker push $DOCKER_USERNAME/precice
+  # - stage: Building preCICE
+  #   script:
+  #   - docker build -f Dockerfile.precice -t precice .
+  #   after_success:
+  #   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  #   - docker images
+  #   - docker tag precice $DOCKER_USERNAME/precice
+  #   - docker push $DOCKER_USERNAME/precice
   - stage: System Tests
     script:
     - python system_testing.py su2-ccx
