@@ -3,10 +3,10 @@ dist: trusty
 notifications:
   email:
     recipients:
-      - kunstrasenspringer@gmx.net
-      - kunstrasenspringer@googlemail.com
-    on_success: never # default: change
-    on_failure: always # default: always
+    - kunstrasenspringer@gmx.net
+    - kunstrasenspringer@googlemail.com
+    on_success: never
+    on_failure: always
 jobs:
   include:
   - stage: Building preCICE
@@ -21,21 +21,21 @@ jobs:
     script:
     - python system_testing.py su2-ccx
     after_success:
-    - sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/push_su2-ccx.sh
+    - python push.py 1 su2-ccx
     after_failure:
-    - sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/push_su2-ccx.sh $TRAVIS_BUILD_DIR/SystemTest_su2-ccx/Output_su2-ccx
+    - python push.py 0 su2-ccx
   - script:
     - python system_testing.py of-of
     after_success:
-    - sh $TRAVIS_BUILD_DIR/SystemTest_of-of/push_of-of.sh
+    - python push.py 1 of-of
     after_failure:
-    - sh $TRAVIS_BUILD_DIR/SystemTest_of-of/push_of-of.sh $TRAVIS_BUILD_DIR/SystemTest_of-of/Output_of-of
+    - python push.py 0 of-of
   - script:
     - python system_testing.py of-ccx
     after_success:
-    - sh $TRAVIS_BUILD_DIR/SystemTest_of-ccx/push_of-ccx.sh
+    - python push.py 1 of-ccx
     after_failure:
-    - sh $TRAVIS_BUILD_DIR/SystemTest_of-ccx/push_of-ccx.sh $TRAVIS_BUILD_DIR/SystemTest_of-ccx/Output_of-ccx
+    - python push.py 0 of-ccx
 env:
   global:
-    secure: rM4naaBFg4a3v6NacTd7BbZ9LYuLFs4Pgqe9lYM6fZtg7hNCosf1WP26mn/P7MgCoCB6S3LvMFPiCXAcs5wYT2FJk4aKGfUC1X3umO938CJOWGTSbhkmI5BvutksOOtyDR57URlj8pBsYVOMU1QE8to33crFXo3QEm/1DLtsgHOpRBjqhDaNh44RdzbjpN5fmZFJWOXPx+v+IXOngrdrxHAy8N0nR95oBPuFz8tgLswvmYUvQRlX2l3Ku1XNxLzp7YeviLVb7t3czf3p1B6pttSqtgrkRQ5kXPPNz5XmKWnGgkRsGzTWHqiKAkraRzOz0OS66/EjGk7MAKVAkRoLtOeYDDfmMn+Z3qQ9XwCC8WhnyQSdz6s+/oWqw+tF0ErT65azbZ0iOzgsXOmGTp4ai5TNWbXd1/vMErHHy7GPghUm2gKusAbtaUgi0Zj+GyRUGiU0Vxemm1mLFGKPpuP+B+1M5zWIDWN11DROewK1Fm8xsJ2gF8+//8o/Xau2niO+ZfTje2mP7SOjZiJJM6Qo7HN/KMecK27BRPbDm+LekTc5U6IViyoI2fHt/6sUpLsGphaKClMW3513leacGjYJZW1d8K9vjbBcfvF4TevCztgkW7Vz3hrQlkBDL0Ghr8vefl5JYKDf/JJ7O08noSyMSGC0ueupz6iw+mojuhOPz2c=
+    secure: UwGv0skdfJ5Tc6n+iVI645d2m+M57/1n135sTHtR634U/BtlaU8qi9WE0zo8qcg58hJI4CdKBdTPLIQGUhPzy6ELdu1EyYFgvSg/+eT4tVjd1Eo/hmi6NRSUeWfRTrnvNEm5OP+rAxbpbHvSMCp6OZxLhUMR3APxhImXEf7AU0a99yq8gprahYlr24f28e5JFyFQWX1A1vK2sYRTbsr0zroYFSR07u2idyFptL5hbnEb41fqS2jMUZFyWC02SYQBFItN3s20UlZLT+WMCjn/L5ksi1Jqlc51NkLykhy0k5JRFOaYl+40l4giKrXOfVe7dKXux74O/wIqWE8Voo7Q4kmPrf8DBzz3K6E+AR8LdsxhbOy6QRW2t6OnI44T+8XtnQThUxzV+wsjdC3n5AMkpifdfBTiMrRfQVNV5KIOYAVXC7HnAPhvF6rGiyqAdY/2YPgwSlHR9WUgFydlEzsCjJw+PcJYGg00YlK8/RExa/U6kjnRqvKtYsGkctwunEANQ52PUKnvEaC+HX3h/KqJlesFKbKnKjNbXOjOF8oAOfZHNBP5v81s9UBM/yuZFrn7O0+eoTooPobIZ2/TqoW5l4sUAS2QR16aIGyjCPoO24VMjcNlVIz2Uq7IF0kNwi4KQuOeWhe2DbkGCOLLcm5sUhtGd3QMig6UMMQKTiD2ZtY=
