@@ -51,7 +51,7 @@ if __name__ == "__main__":
     # Saving current date in logfile.
     localtime = str(time.asctime(time.localtime(time.time())))
     log.write("System testing at " + localtime + "\n")
-
+    log.close()
 
     # Pushing outputfiles and logfile to repo.
     # Clone repository.
