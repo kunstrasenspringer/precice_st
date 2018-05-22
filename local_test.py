@@ -12,6 +12,7 @@ of preCICE system test.
 
 import subprocess
 import argparse
+import os
 
 # Parsing flags
 parser = argparse.ArgumentParser(description='Build local.')
@@ -20,6 +21,39 @@ parser.add_argument('-s', '--systemtest', nargs='+', help="choose system tests y
 args = parser.parse_args()
 
 if __name__ == "__main__":
+    tests=['of-of', 'of-ccx', 'su2-ccx']
+    if args.systemtest:
+        tests=args.systemtest
+
+    # Checking for older docker images
+    devnull = open(os.devnull, 'w')
+    lst1 = list(( x for x in tests if subprocess.call("docker image ls | grep " + x, shell=True, stdout=devnull) == 0))
+    if subprocess.call("docker image ls | grep precice", shell=True, stdout=devnull) == 0:
+        lst1.append('precice')
+    if lst1:
+        print "Deleting following docker images:\n"
+        for x in lst1:
+            subprocess.call("docker image ls | grep " + x, shell=True)
+        answer = raw_input("\nOk? (yes/no)\n")
+        if answer=="yes" or answer=="y":
+            for x in lst1:
+                subprocess.call("docker rmi -f " + x, shell=True)
+        else:
+            print "BE CAREFUL!: Not deleting previous images can later lead to problems.\n\n"
+    # Checking for older docker containers
+    lst2 = list(( x for x in tests if subprocess.call("docker ps -a | grep " + x + "_container", shell=True, stdout=devnull) == 0))
+    if lst2:
+        print "Deleting following docker containers\n"
+        for x in lst2:
+            subprocess.call("docker ps -a | grep " + x + "_container", shell=True)
+        answer = raw_input("\nOk? (yes/no)\n")
+        if answer=="yes" or answer=="y":
+            for x in lst2:
+                subprocess.call("docker rm -f " + x + "_container", shell=True)
+        else:
+            print "BE CAREFUL!: Not deleting previous containers can later lead to problems."
+
+    # Building preCICE
     print "\n\nBuilding preCICE docker image with choosen branch\n\n"
     branch = "develop"
     if args.branch:
@@ -29,19 +63,17 @@ if __name__ == "__main__":
     except:
         raise Exception('Building preCICE with choosen branch docker image failed!')
 
-    tests=['of-of', 'of-ccx', 'su2-ccx']
-    if args.systemtest:
-        tests=args.systemtest
+    # Starting system tests
     failed = []
     success = []
     for x in tests:
         print "\n\nStarting system test %s\n\n" % x
-        try:
-            subprocess.call("python system_testing.py --local -s " + x, shell=True)
+        if subprocess.call("python system_testing.py --local -s " + x, shell=True) == 0:
             success.append(x)
-        except:
+        else:
             failed.append(x)
 
+    # Results
     print "\n\n\n\n\nLocal build finished.\n"
     if success:
         print "Following system tests succeeded: "
@@ -52,6 +84,7 @@ if __name__ == "__main__":
         print ", ".join(failed)
         print '\n'
 
+    # Push
     answer = raw_input("Do you want to push the results (logfiles and possibly output files) to the output repo? (yes/no)\n")
     if answer=='yes' or answer=='y':
         for x in success:

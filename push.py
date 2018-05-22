@@ -67,14 +67,15 @@ if __name__ == "__main__":
 
     if not args.success:
         # Move ouput to local repository.
-        subprocess.call(["mv "+ os.getcwd() +"/SystemTest_"+systest+"/Output_"+systest+" "+ os.getcwd()], shell=True)
-        subprocess.call(["mv "+ os.getcwd() +"/log_"+systest+" "+ os.getcwd()], shell=True)
+        subprocess.call(["mv "+ os.path.abspath(os.path.join(os.getcwd(), os.pardir)) +"/SystemTest_"+systest+"/Output_"+systest+" "+ os.getcwd()], shell=True)
+        subprocess.call(["mv "+ os.path.abspath(os.path.join(os.getcwd(), os.pardir)) +"/log_"+systest+" "+ os.getcwd()], shell=True)
         subprocess.call(["git add ."], shell=True)
         if args.branch:
             subprocess.call(["git commit -m \"Output != Reference, local build with preCICE branch: "+ args.branch +"\""], shell=True)
         else:
             subprocess.call(["git commit -m \"Output != Reference, build number: ${TRAVIS_BUILD_NUMBER}\""], shell=True)
     else:
+        subprocess.call("rm -rf Output_" + systest, shell=True)
         subprocess.call(["mv "+ os.path.abspath(os.path.join(os.getcwd(), os.pardir)) +"/log_"+systest+" "+ os.getcwd()], shell=True)
         subprocess.call(["git add ."], shell=True)
         if args.branch:
