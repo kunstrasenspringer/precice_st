@@ -7,15 +7,22 @@ The output is compared to a reference.
 It passes if files are equal, else it raises an exception.
 
 Example:
-    Example use:
+    System test of-of and use local preCICE image
 
-        $ python system_testing.py of-of
+        $ python system_testing.py -s of-of -l
 """
 
 import sys
 import os
 import subprocess
 import filecmp
+import argparse
+
+# Parsing flags
+parser = argparse.ArgumentParser(description='Build local.')
+parser.add_argument('-l', '--local', action='store_const', const=42, help="use local preCICE image (default: use remote image)")
+parser.add_argument('-s', '--systemtest', help="choose system tests you want to use")
+args = parser.parse_args()
 
 def build(systest):
     """Building docker image.
@@ -31,7 +38,10 @@ def build(systest):
     print(os.getcwd() + dirname)
     os.chdir(os.getcwd() + dirname)
     print(os.getcwd())
-    subprocess.call("docker build -t "+ systest +" -f Dockerfile."+ systest +" .", shell=True)
+    if args.local:
+        subprocess.call("docker build -t "+ systest +" -f Dockerfile."+ systest +" --build-arg from=precice:latest .", shell=True)
+    else:
+        subprocess.call("docker build -t "+ systest +" -f Dockerfile."+ systest +" .", shell=True)
     subprocess.call("docker run -it -d --name "+ systest +"_container "+ systest, shell=True)
     subprocess.call("docker cp "+ systest +"_container:Output_"+ systest +" .", shell=True)
 
@@ -64,9 +74,9 @@ def comparison(pathToRef, pathToOutput):
 
 if __name__ == "__main__":
     # Build
-    build(sys.argv[1])
+    build(args.systemtest)
     # Preparing string for path
-    pathToRef = os.getcwd() + "/referenceOutput_" + sys.argv[1] + "/"
-    pathToOutput = os.getcwd() + "/Output_" + sys.argv[1] + "/"
+    pathToRef = os.getcwd() + "/referenceOutput_" + args.systemtest + "/"
+    pathToOutput = os.getcwd() + "/Output_" + args.systemtest + "/"
     # Comparing
     comparison(pathToRef, pathToOutput)

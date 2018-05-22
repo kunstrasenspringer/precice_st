@@ -1,7 +1,8 @@
 # System testing preCICE with SU2-adapter and calculix-adapter
 
 # Building on top of the latest preCICE-build
-FROM kunstrasenspringer/precice:latest
+ARG from=kunstrasenspringer/precice:latest
+FROM $from
 
 USER root
 ENV USER=root

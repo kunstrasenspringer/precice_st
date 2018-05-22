@@ -33,6 +33,8 @@ ENV PETSC_ARCH="x86_64-linux-gnu-real"
 # Building preCICE
 RUN git clone https://github.com/precice/precice.git
 WORKDIR precice
+ARG branch=develop
+RUN git fetch && git checkout $branch
 # Some parameters for the build, you can set them in the build command e.g.
 # sudo docker build Dockerfile.precice --build-arg petsc_para=yes --build-arg mpi_para=yes .
 # this will result in
@@ -43,6 +45,6 @@ ARG python_para=no
 RUN scons petsc=$petsc_para mpi=$mpi_para python=$python_para -j2
 
 # Setting preCICE environment variables
-ENV PRECICE_ROOT="/precice" 
+ENV PRECICE_ROOT="/precice"
 ENV LD_LIBRARY_PATH="$PRECICE_ROOT/build/last:${LD_LIBRARY_PATH}"
 ENV LIBRARY_PATH="$PRECICE_ROOT/build/last:${LIBRARY_PATH}"

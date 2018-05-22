@@ -9,33 +9,33 @@ notifications:
     on_failure: always
 jobs:
   include:
-  # - stage: Building preCICE
-  #   script:
-  #   - docker build -f Dockerfile.precice -t precice .
-  #   after_success:
-  #   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  #   - docker images
-  #   - docker tag precice $DOCKER_USERNAME/precice
-  #   - docker push $DOCKER_USERNAME/precice
+  - stage: Building preCICE
+    script:
+    - docker build -f Dockerfile.precice -t precice .
+    after_success:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker images
+    - docker tag precice $DOCKER_USERNAME/precice
+    - docker push $DOCKER_USERNAME/precice
   - stage: System Tests
     script:
-    - python system_testing.py su2-ccx
+    - python system_testing.py -s su2-ccx
     after_success:
-    - python push.py 1 su2-ccx
+    - python push.py -s -t su2-ccx
     after_failure:
-    - python push.py 0 su2-ccx
+    - python push.py -t su2-ccx
   - script:
-    - python system_testing.py of-of
+    - python system_testing.py -s of-of
     after_success:
-    - python push.py 1 of-of
+    - python push.py -s -t of-of
     after_failure:
-    - python push.py 0 of-of
+    - python push.py -t of-of
   - script:
-    - python system_testing.py of-ccx
+    - python system_testing.py -s of-ccx
     after_success:
-    - python push.py 1 of-ccx
+    - python push.py -s -t of-ccx
     after_failure:
-    - python push.py 0 of-ccx
+    - python push.py -t of-ccx
 env:
   global:
-    secure: UwGv0skdfJ5Tc6n+iVI645d2m+M57/1n135sTHtR634U/BtlaU8qi9WE0zo8qcg58hJI4CdKBdTPLIQGUhPzy6ELdu1EyYFgvSg/+eT4tVjd1Eo/hmi6NRSUeWfRTrnvNEm5OP+rAxbpbHvSMCp6OZxLhUMR3APxhImXEf7AU0a99yq8gprahYlr24f28e5JFyFQWX1A1vK2sYRTbsr0zroYFSR07u2idyFptL5hbnEb41fqS2jMUZFyWC02SYQBFItN3s20UlZLT+WMCjn/L5ksi1Jqlc51NkLykhy0k5JRFOaYl+40l4giKrXOfVe7dKXux74O/wIqWE8Voo7Q4kmPrf8DBzz3K6E+AR8LdsxhbOy6QRW2t6OnI44T+8XtnQThUxzV+wsjdC3n5AMkpifdfBTiMrRfQVNV5KIOYAVXC7HnAPhvF6rGiyqAdY/2YPgwSlHR9WUgFydlEzsCjJw+PcJYGg00YlK8/RExa/U6kjnRqvKtYsGkctwunEANQ52PUKnvEaC+HX3h/KqJlesFKbKnKjNbXOjOF8oAOfZHNBP5v81s9UBM/yuZFrn7O0+eoTooPobIZ2/TqoW5l4sUAS2QR16aIGyjCPoO24VMjcNlVIz2Uq7IF0kNwi4KQuOeWhe2DbkGCOLLcm5sUhtGd3QMig6UMMQKTiD2ZtY=
+  - secure: b4FQhQOaD/lE0FkV8gpPrjt8tqhyodOl3xKYc1wYKWjKBmJTV1SmwfeQW08rdBBdBETKuvd5dC8FAJ8zS3RaxLbFd/pT//9Uew9qFoG//faASqjzHK57m2BA0N/vt+0kyesbn+D1NNCPCOQhnohJqzF87beZnUQZDRWo1ueWG06K/4oCrdDcEKLjKZy/1a0dBR/gFV/4Ae/YFUhO14MN4+g53F5ZyrBiikEn8tv3dg+/NFVCfb9Dy7UC4J91f4+30wwysK/UIW2oZNrXyQldpa7BEzG5PsglZu1p3qebEeZfesemlR85nZA8O/pH0sVVk7FvxbQ7PSsfG5zU7hxNBCiIHKT0WqUDI75uCF0Z0uezFqwPM5CflpN1nCseh0FFKKWcrYQr/Vf2cQL2ItsBO7rjw7BmLAyWJ/1kIMs6YTOOhoN2iEqAxn9lZX6M3RJMF9UivfqnPsOPSJGf5ySIoLKix3bHdX5gGF4ojjqyy9WwPxgtnjQjxSq2u/WUcEitH3J4T2h35t4UlgO7Zvv2oYZeXWNSi4ZTogGvA5KNOAYPUncaJmhNZil2cXFEyX3G02745MY4d7QZHyylYC8k+YdrWNMp3b8rl6C5KBJnjSJ3edkLxAU6DYFfCmFfzfNdN+FuhG9A4Ueq2DEw7oZVL5LQ7cqXQ/oTTaLO0cbZ76k=
