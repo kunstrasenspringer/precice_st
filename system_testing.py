@@ -20,8 +20,9 @@ import argparse
 
 # Parsing flags
 parser = argparse.ArgumentParser(description='Build local.')
-parser.add_argument('-l', '--local', action='store_const', const=42, help="use local preCICE image (default: use remote image)")
+parser.add_argument('-l', '--local', action='store_true', help="use local preCICE image (default: use remote image)")
 parser.add_argument('-s', '--systemtest', help="choose system tests you want to use")
+parser.add_argument('-b', '--branch', help="preCICE branch to use", default = "develop")
 args = parser.parse_args()
 
 def build(systest):
@@ -39,7 +40,8 @@ def build(systest):
     os.chdir(os.getcwd() + dirname)
     print(os.getcwd())
     if args.local:
-        subprocess.call("docker build -t "+ systest +" -f Dockerfile."+ systest +" --build-arg from=precice:latest .", shell=True)
+        subprocess.call("docker build -t {systest} -f Dockerfile.{systest} --build-arg from=precice-{branch}:latest .".format(systest = systest, branch = args.branch),
+                        shell=True)
     else:
         subprocess.call("docker build -t "+ systest +" -f Dockerfile."+ systest +" .", shell=True)
     subprocess.call("docker run -it -d --name "+ systest +"_container "+ systest, shell=True)
